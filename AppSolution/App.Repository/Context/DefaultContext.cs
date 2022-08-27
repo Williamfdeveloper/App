@@ -1,6 +1,4 @@
-﻿
-
-using App.Domain.Entities;
+﻿using App.Domain.Entities;
 using App.Repository.Configuration;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
