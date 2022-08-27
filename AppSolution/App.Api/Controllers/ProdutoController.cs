@@ -8,7 +8,7 @@ namespace App.Api.Controllers
 {
     [AllowAnonymous]
     [ApiController]
-    [Route("[controller]")]
+    [Route("api/[controller]")]
     public class ProdutoController : Controller
     {
         private readonly IProdutoService _produtoService;
@@ -19,9 +19,33 @@ namespace App.Api.Controllers
         }
 
         [HttpGet]
-        public IList<Produto> Get()
+        public ActionResult Get()
         {
-            return _produtoService.ListarProdutos();
+            try
+            {
+                return Ok(_produtoService.ListarProdutos());
+            }
+            catch (System.Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
+
+        [HttpGet("{id}")]
+        //[Route("GetProduto")]
+        public ActionResult GetProduto(int id)
+        {
+            try
+            {
+                return Ok(_produtoService.BuscarProduto(id));
+            }
+            catch (System.Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+
+
+        }
+
     }
 }

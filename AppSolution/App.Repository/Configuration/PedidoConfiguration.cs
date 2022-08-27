@@ -19,7 +19,7 @@ namespace App.Repository.Configuration
 
             // Properties / Column Mapping
             builder.Property(e => e.CodigoPedido).HasColumnName("CD_PEDIDO").IsRequired().ValueGeneratedOnAdd();
-            builder.Property(e => e.Usuario).HasColumnName("CD_USUARIO").IsRequired();
+            builder.Property(e => e.Id).HasColumnName("CD_USUARIO").IsRequired();
             builder.Property(e => e.ValorTotal).HasColumnName("MO_VALOR_TOTAL").IsRequired().HasColumnType("decimal(18,2)");
             builder.Property(e => e.ValorTotalComDesconto).HasColumnName("MO_VALOR_TOTAL_COM_DESCONTO").IsRequired().HasColumnType("decimal(18,2)");
             builder.Property(e => e.QuatidadeItensVenda).HasColumnName("QT_ITENS_VENDA").IsRequired();
@@ -28,9 +28,7 @@ namespace App.Repository.Configuration
             builder.Property(e => e.SituacaoPedido).HasColumnName("ID_SITUACAO_PEDIDO").IsRequired();
 
 
-            // relationsShips
-            //this.HasRequired(m => m.Cidades);
-            //this.HasMany(x => x.Cidades).WithRequired(x => x.Estado).HasForeignKey(x => x.Estado);
+            
         }
     }
 }

@@ -16,11 +16,12 @@ namespace App.Repository.Context
 
 
         }
-
         
         public virtual DbSet<Cartao> Cartao { get; set; }
+        public virtual DbSet<EmailSistema> EmailSistema { get; set; }
         public virtual DbSet<Endereco> Endereco { get; set; }
         public virtual DbSet<FormaPagamento> FormaPagamento { get; set; }
+        public virtual DbSet<ParametrosSistema> ParametrosSistema { get; set; }
         public virtual DbSet<Pedido> Pedido { get; set; }
         public virtual DbSet<PedidoHistorico> PedidoHistorico { get; set; }
         public virtual DbSet<PedidoItem> PedidoItem { get; set; }
@@ -36,8 +37,10 @@ namespace App.Repository.Context
         {
             
             modelBuilder.ApplyConfiguration(new CartaoConfiguration());
+            modelBuilder.ApplyConfiguration(new EmailSistemaConfiguration());
             modelBuilder.ApplyConfiguration(new EnderecoConfiguration());
             modelBuilder.ApplyConfiguration(new FormaPagamentoConfiguration());
+            modelBuilder.ApplyConfiguration(new ParametrosSistemaConfiguration());
             modelBuilder.ApplyConfiguration(new PedidoConfiguration());
             modelBuilder.ApplyConfiguration(new PedidoHistoricoConfiguration());
             modelBuilder.ApplyConfiguration(new PedidoItemConfiguration());

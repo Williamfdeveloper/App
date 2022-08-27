@@ -76,3 +76,4 @@ C:\git\App\AppSolution\App.Api\bin\Debug\netcoreapp3.1\Microsoft.OpenApi.dll
 C:\git\App\AppSolution\App.Api\bin\Debug\netcoreapp3.1\Swashbuckle.AspNetCore.Swagger.dll
 C:\git\App\AppSolution\App.Api\bin\Debug\netcoreapp3.1\Swashbuckle.AspNetCore.SwaggerGen.dll
 C:\git\App\AppSolution\App.Api\bin\Debug\netcoreapp3.1\Swashbuckle.AspNetCore.SwaggerUI.dll
+C:\git\App\AppSolution\App.Api\bin\Debug\netcoreapp3.1\Microsoft.IdentityModel.Abstractions.dll

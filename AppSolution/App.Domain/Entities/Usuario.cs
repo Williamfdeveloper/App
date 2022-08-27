@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Identity;
+using System;
 using System.Collections.Generic;
 
 namespace App.Domain.Entities
@@ -13,12 +14,13 @@ namespace App.Domain.Entities
 
 
 
-        public Guid Codigo { get; set; }
+        public string Id { get; set; }
         public string Nome { get; set; }
         public string CPF { get; set; }
         public DateTime DataNascimento { get; set; }
         public int Sexo { get; set; }
 
+        public virtual IdentityUser IdentityUser { get; set; }
         public virtual ICollection<Endereco> Endereco { get; set; }
         public virtual ICollection<Pedido> Pedidos { get; set; }
     }

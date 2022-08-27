@@ -15,19 +15,17 @@ namespace App.Repository.Configuration
             builder.ToTable("TB_USUARIO", "dbo");
 
             // Primary Key
-            builder.HasKey(m => new { m.Codigo });
+            builder.HasKey(m => new { m.Id });
 
             // Properties / Column Mapping
-            builder.Property(e => e.Codigo).HasColumnName("CD_DADO_USUARIO").IsRequired().ValueGeneratedOnAdd();
+            builder.Property(e => e.Id).HasColumnName("CD_USUARIO").IsRequired();
             builder.Property(e => e.Nome).HasColumnName("DC_NOME").IsRequired();
             builder.Property(e => e.CPF).HasColumnName("DC_CPF").IsRequired();
             builder.Property(e => e.DataNascimento).HasColumnName("DT_NASCIMENTO").IsRequired();
             builder.Property(e => e.Sexo).HasColumnName("ID_SEXO").IsRequired();
 
 
-            // relationsShips
-            //this.HasRequired(m => m.Cidades);
-            //this.HasMany(x => x.Cidades).WithRequired(x => x.Estado).HasForeignKey(x => x.Estado);
+            
         }
     }
 }

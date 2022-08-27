@@ -4,36 +4,16 @@ using System.Text;
 
 namespace App.Domain
 {
-    public class Constant
+    public static class Constant
     {
-        public enum FormaPagamento
-        {
-            Boleto = 1,
-            Credito = 2,
-            Debito = 3
-        }
+        public const string SecretPsw = "VOjA@Orh@xB$Ft7dD$KlCL04Jb#f^0frTWLoOF^U";
+        public const string SecretJwt = "&h3RqpkCim^x3$ZRo35zwSno@iwlb!";
 
-        public enum SituacaoPedido
-        {
-            EmCaptacao = 1,
-            Finalizado = 2,
-            Cancelado = 3,
-            Entregue = 4
-        }
-
-        public enum SituacaoPedidoPagamento
-        {
-            Iniciada = 1,
-            EmAprovacao = 2,
-            Aprovado = 3,
-            Cancelado = 4
-        }
-
-        public enum Sexo
-        {
-            Masculino = 1,
-            Feminino = 2,
-            Outros = 3
-        }
+        public const string ParametroTemplateDefault = "HtmlTemplateEmailDefault";
+        public const string ParametroTemplateResetSenha = "HtmlTemplateEmailResetSenha";
+        public const string ParametroTipoSaveImagem = "ParametroTipoImagem";
+        public const string ParametroCaminhoPastaArquivo = "ParametroCaminhoPastaArquivo";
+        public const string ParametroEnviarEmailResetSenha = "ParametroEnviarEmailResetSenha";
+        public const string ParametroEnviarConfirmacaoEmail = "ParametroEnviarConfirmacaoEmail";
     }
 }

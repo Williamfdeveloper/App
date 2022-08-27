@@ -15,11 +15,11 @@ namespace App.Repository.Configuration
             builder.ToTable("TB_PESSOA_ENDERECO", "dbo");
 
             // Primary Key
-            builder.HasKey(m => new { m.CodigoEndereco });
+            builder.HasKey(m => new { m.CodigoEndereco, m.Id });
 
             // Properties / Column Mapping
             builder.Property(e => e.CodigoEndereco).HasColumnName("ID_ENDERECO").IsRequired().ValueGeneratedOnAdd();
-            builder.Property(e => e.Usuario).HasColumnName("CD_USUARIO").IsRequired();
+            builder.Property(e => e.Id).HasColumnName("CD_USUARIO").IsRequired();
             builder.Property(e => e.Rua).HasColumnName("DC_RUA").IsRequired();
             builder.Property(e => e.Numero).HasColumnName("DC_NUMERO").IsRequired();
             builder.Property(e => e.Bairro).HasColumnName("DC_BAIRRO").IsRequired();

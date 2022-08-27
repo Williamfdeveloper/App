@@ -122,3 +122,8 @@ C:\git\App\AppSolution\App.Test\bin\Debug\netcoreapp3.1\Microsoft.Extensions.Ide
 C:\git\App\AppSolution\App.Test\bin\Debug\netcoreapp3.1\Microsoft.Extensions.Identity.Stores.dll
 C:\git\App\AppSolution\App.Test\bin\Debug\netcoreapp3.1\App.Domain.dll
 C:\git\App\AppSolution\App.Test\bin\Debug\netcoreapp3.1\App.Domain.pdb
+C:\git\App\AppSolution\App.Test\bin\Debug\netcoreapp3.1\Microsoft.IdentityModel.Abstractions.dll
+C:\git\App\AppSolution\App.Test\bin\Debug\netcoreapp3.1\Microsoft.IdentityModel.JsonWebTokens.dll
+C:\git\App\AppSolution\App.Test\bin\Debug\netcoreapp3.1\Microsoft.IdentityModel.Logging.dll
+C:\git\App\AppSolution\App.Test\bin\Debug\netcoreapp3.1\Microsoft.IdentityModel.Tokens.dll
+C:\git\App\AppSolution\App.Test\bin\Debug\netcoreapp3.1\System.IdentityModel.Tokens.Jwt.dll

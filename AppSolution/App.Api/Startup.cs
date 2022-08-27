@@ -1,3 +1,4 @@
+using App.Domain;
 using App.Domain.Contracts;
 using App.Domain.Contracts.Repository;
 using App.Domain.Service;
@@ -7,6 +8,7 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.AzureAD.UI;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -15,10 +17,12 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace App.Api
@@ -47,12 +51,17 @@ namespace App.Api
             #region IoC
             //Domain
             services.AddTransient<IProdutoService, ProdutoService>();
+            services.AddTransient<ITokenService, TokenService>();
+            services.AddTransient<IEmailSistemaService, EmailSistemaService>();
+            services.AddTransient<IParametrosService, ParametrosService>();
 
             //Adapter
             //services.AddSingleton<IUsuarioAdapter, UsuarioAdapter>();
 
             //Repository
+            services.AddTransient<IEmailSistemaRepository, EmailSistemaRepository>();
             services.AddTransient<IProdutoRepository, ProdutoRepository>();
+            services.AddTransient<IParametrosRepository, ParametrosRepository>();
 
             //services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
             #endregion
@@ -62,11 +71,42 @@ namespace App.Api
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "William F Silva", Version = "v1", });
             });
 
+            var key = Encoding.ASCII.GetBytes(Constant.SecretJwt);
 
+            services.AddAuthentication()
+            .AddCookie(options =>
+            {
+                options.Events.OnRedirectToLogin = options.Events.OnRedirectToAccessDenied = context =>
+                {
+                    context.Response.StatusCode = StatusCodes.Status401Unauthorized;
+                    return Task.CompletedTask;
+                };
+            })
+            .AddJwtBearer(cfg =>
+            {
+                cfg.RequireHttpsMetadata = false;
+                cfg.SaveToken = true;
+                cfg.TokenValidationParameters = new TokenValidationParameters
+                {
+
+                    ValidateIssuerSigningKey = true,
+                    IssuerSigningKey = new SymmetricSecurityKey(key),
+                    ValidateIssuer = false,
+                    ValidateAudience = false,
+                    //ValidIssuer = Configuration["JwtIssuer"],
+                    //ValidAudience = Configuration["JwtIssuer"],
+                    //IssuerSigningKey = new SymmetricSecurityKey(key),
+                    ClockSkew = TimeSpan.Zero // remove delay of token when expire
+                };
+            });
+
+            services.AddIdentityCore<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
+                .AddEntityFrameworkStores<DefaultContext>()
+                .AddTokenProvider<DataProtectorTokenProvider<IdentityUser>>(TokenOptions.DefaultProvider);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, IServiceProvider serviceProvider, UserManager<IdentityUser> userManager)
         {
 
             app.UseSwagger();
@@ -94,6 +134,58 @@ namespace App.Api
             {
                 endpoints.MapControllers();
             });
+
+            using (var serviceScope = app.ApplicationServices.GetRequiredService<IServiceScopeFactory>().CreateScope())
+            {
+                serviceScope.ServiceProvider.GetService<DefaultContext>().Database.Migrate();
+            }
+
+            CreateRoles(serviceProvider).Wait();
+            SeedUsers(userManager);
+        }
+
+        private async Task CreateRoles(IServiceProvider serviceProvider)
+        {
+            var roleManager = serviceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+            var userManager = serviceProvider.GetRequiredService<UserManager<IdentityUser>>();
+            string[] rolesNames = { "Admin", "User", "User_Premium" };
+            IdentityResult result;
+            foreach (var namesRole in rolesNames)
+            {
+                var roleExist = await roleManager.RoleExistsAsync(namesRole);
+                if (!roleExist)
+                {
+                    result = await roleManager.CreateAsync(new IdentityRole(namesRole));
+                }
+            }
+        }
+
+        private static void SeedUsers(UserManager<IdentityUser> userManager)
+        {
+            if (userManager.FindByNameAsync("Williamf.developer@gmail.com").Result == null)
+            {
+                var user = new IdentityUser
+                {
+                    Id = Guid.Parse("44276c41-f2a1-40f6-a9ce-ec0638046200").ToString(),
+                    UserName = "Williamf.developer@gmail.com",
+                    Email = "Williamf.developer@gmail.com",
+                    NormalizedUserName = "WILL",
+                    NormalizedEmail = "WILLIAMF.DEVELOPER@GMAIL.COM",
+                    EmailConfirmed = true,
+
+                };
+
+                var password = "BR@sil500";
+
+                var result = userManager.CreateAsync(user, password).Result;
+
+                if (result.Succeeded)
+                {
+                    userManager.AddToRoleAsync(user, "Admin").Wait();
+                    userManager.AddToRoleAsync(user, "User").Wait();
+                    //userManager.AddToRoleAsync(user, "User_Premium").Wait();
+                }
+            }
         }
     }
 }
