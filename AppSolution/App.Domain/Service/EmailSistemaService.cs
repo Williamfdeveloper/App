@@ -20,7 +20,7 @@ namespace App.Domain.Service
             _IParametrosRepository = IParametrosRepository;
         }
 
-        public bool EnviarConfirmacaoEmail(IdentityUser usuario, string callbackUrl)
+        public bool EnviarConfirmacaoEmail(Usuario usuario, string callbackUrl)
         {
             if (usuario == null)
                 throw new Exception("Usuario Não encontrado para confirmação do email");
@@ -43,7 +43,7 @@ namespace App.Domain.Service
             if (string.IsNullOrEmpty(mensagem))
                 throw new Exception("Mensagem invalido ou em branco.");
 
-            var email = _IEmailSistemaRepository.BuscarEmail((int)Enum.TipoEmailSistema.Sistema);
+            var email = _IEmailSistemaRepository.BuscarEmail((int)EnumTipo.TipoEmailSistema.Sistema);
 
             if (email == null) return false;
 
@@ -51,7 +51,7 @@ namespace App.Domain.Service
 
         }
 
-        public bool EnviarEmailResetSenha(IdentityUser usuario, string callbackUrl)
+        public bool EnviarEmailResetSenha(Usuario usuario, string callbackUrl)
         {
             if (usuario == null)
                 throw new Exception("Usuario Não encontrado para redefinição da senha");
@@ -63,7 +63,7 @@ namespace App.Domain.Service
             return EnviarEmail(usuario, callbackUrl, "Redefinição de Senha", 1);
 
         }
-        private string GerarEmailResetSenha(IdentityUser Usuario, string UrlValidacao)
+        private string GerarEmailResetSenha(Usuario Usuario, string UrlValidacao)
         {
             var parametroHTML = _IParametrosRepository.BuscarParametro(Constant.ParametroTemplateResetSenha);
             if (parametroHTML != null)
@@ -80,7 +80,7 @@ namespace App.Domain.Service
             }
             return string.Empty;
         }
-        private string GerarEmailConfirmacao(IdentityUser Usuario, string UrlValidacao)
+        private string GerarEmailConfirmacao(Usuario Usuario, string UrlValidacao)
         {
             var parametroHTML = _IParametrosRepository.BuscarParametro(Constant.ParametroTemplateDefault);
             if (parametroHTML != null)
@@ -132,7 +132,7 @@ namespace App.Domain.Service
         /// <param name="assuntoEmail"></param>
         /// <param name="tipoValidacao">1 = Reset de senha | 2 - Confirmação email</param>
         /// <returns></returns>
-        private bool EnviarEmail(IdentityUser usuario, string Url, string assuntoEmail, int tipoValidacao)
+        private bool EnviarEmail(Usuario usuario, string Url, string assuntoEmail, int tipoValidacao)
         {
             string Body = string.Empty;
             switch (tipoValidacao)
@@ -147,7 +147,7 @@ namespace App.Domain.Service
                     break;
             }
 
-            var email = _IEmailSistemaRepository.BuscarEmail((int)Enum.TipoEmailSistema.Sistema);
+            var email = _IEmailSistemaRepository.BuscarEmail((int)EnumTipo.TipoEmailSistema.Sistema);
 
             if (email == null) return false;
 

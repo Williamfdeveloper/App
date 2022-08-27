@@ -1,7 +1,8 @@
-﻿using App.Api.Model;
+﻿using App.Domain;
 using App.Domain.Contracts;
 using App.Domain.Entities;
-using App.Model;
+using App.Domain.Entities.Login;
+using App.Domain.Entities.Register;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -13,7 +14,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Text.Encodings.Web;
 using System.Threading.Tasks;
 
 namespace App.Api.Controllers
@@ -24,25 +24,28 @@ namespace App.Api.Controllers
     public class AccountController : Controller
     {
 
-        private UserManager<IdentityUser> _userManager;
+        private UserManager<Usuario> _userManager;
         private readonly ILogger<AccountController> _logger;
         private readonly ITokenService _TokenService;
         private readonly IEmailSistemaService _emailService;
+        private readonly IAccountService _accountService;
         private readonly RoleManager<IdentityRole> _roleManager;
-        private readonly SignInManager<IdentityUser> _signInManager;
+        private readonly SignInManager<Usuario> _signInManager;
         private readonly IHttpContextAccessor _httpContextAccessor;
 
 
         public IList<AuthenticationScheme> ExternalLogins { get; set; }
 
-        public AccountController(UserManager<IdentityUser> usrMgr,
+        public AccountController(UserManager<Usuario> usrMgr,
             ILogger<AccountController> logger,
             RoleManager<IdentityRole> RoleManager,
             ITokenService ITokenService,
             IEmailSistemaService emailService,
-            SignInManager<IdentityUser> signInManager,
-            IHttpContextAccessor httpContextAccessor)
+            SignInManager<Usuario> signInManager,
+            IHttpContextAccessor httpContextAccessor,
+            IAccountService accountService)
         {
+            _accountService = accountService;
             _httpContextAccessor = httpContextAccessor;
             _signInManager = signInManager;
             _roleManager = RoleManager;
@@ -65,40 +68,7 @@ namespace App.Api.Controllers
                 if (!ModelState.IsValid)
                     return View();
 
-                if (string.IsNullOrEmpty(model.Email))
-                    throw new CustomException() { mensagemErro = $"Email nao informado" };
-
-                if (string.IsNullOrEmpty(model.Password))
-                    throw new CustomException() { mensagemErro = $"Email nao informado" };
-
-                //var psw = Util.Decrypt(model.Password);
-
-                // This doesn't count login failures towards account lockout
-                // To enable password failures to trigger account lockout, set lockoutOnFailure: true
-                var result = await _signInManager.PasswordSignInAsync(model.Email, model.Password, true, lockoutOnFailure: false);
-                if (!result.Succeeded)
-                    throw new CustomException() { mensagemErro = $"Usuario não encontrado." };
-
-                _logger.LogInformation("User logged in.");
-
-                // Recupera o usuário
-                var user = await _userManager.FindByEmailAsync(model.Email);
-
-                // Verifica se o usuário existe
-                if (user == null)
-                    return NotFound(new { message = "Usuário não encontrado" });
-
-                // Gera o Token
-                var token = _TokenService.GenerateToken(user);
-
-                // Oculta a senha
-                user.PasswordHash = "";
-
-                return Ok(new LoginResponse()
-                {
-                    user = user,
-                    token = token,
-                });
+                return Ok(_accountService.AuthenticateAsync(model).Result);
             }
             catch (CustomException cex)
             {
@@ -138,73 +108,150 @@ namespace App.Api.Controllers
         [HttpPost]
         [AllowAnonymous]
         [Route("register")]
-        public async Task<ActionResult> RegisterAsync([FromBody] Register model)
+        public ActionResult Register([FromBody] Register model)
         {
-
-            if (model.Password != model.ConfirmPassword)
-                return BadRequest("Senha e confirmação de senha não são iguais");
-
-            var returnUrl = Url.Content("~/");
-            ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
-            if (ModelState.IsValid)
+            try
             {
-                var user = new IdentityUser { UserName = model.Email, Email = model.Email };
-                var result = await _userManager.CreateAsync(user, model.Password);
-                if (result.Succeeded)
+                if (!ModelState.IsValid)
                 {
-                    _logger.LogInformation("User created a new account with password.");
-
-                    var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
-                    code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
-                    var request = _httpContextAccessor.HttpContext.Request;
-
-                    var callbackUrl = $"{request.Scheme}://{request.Host}/api/account/confirmemail?userId={user.Id}&code={code}";
-
-                    var _usuario = await _userManager.FindByEmailAsync(model.Email);
-
-                    _emailService.EnviarConfirmacaoEmail(_usuario, callbackUrl);
-
-                    //-------------------atribuir role ao user------------------------------
-                    var applicationRole = await _roleManager.FindByNameAsync("User");
-                    if (applicationRole != null)
+                    StringBuilder sb = new StringBuilder();
+                    foreach (var error in ModelState.Select(x => x.Value.Errors).Where(y => y.Count > 0).ToList())
                     {
-                        IdentityResult roleResult = await _userManager.AddToRoleAsync(user, applicationRole.Name);
+                        sb.Append(error);
                     }
-
-                    //var applicationRoleUserPremium = await _roleManager.FindByNameAsync("User_Premium");
-                    //if (applicationRoleUserPremium != null)
-                    //{
-                    //    IdentityResult roleResult = await _userManager.AddToRoleAsync(user, applicationRoleUserPremium.Name);
-                    //}
-
-                    if (_userManager.Options.SignIn.RequireConfirmedAccount)
-                    {
-
-                        return Ok( //$"Cadastro realizado, confirme seu email - {callbackUrl}"
-                            new RegisterResponse()
-                            {
-                                user = _usuario,
-                                urlConfirmarEmail = callbackUrl
-                            });
-                    }
-                    else
-                    {
-                        await _signInManager.SignInAsync(user, isPersistent: false);
-                        return Ok(new RegisterResponse()
-                        {
-                            user = _usuario,
-                            urlConfirmarEmail = string.Empty
-                        });
-                    }
+                    throw new CustomException() { mensagemErro = sb.ToString() };
                 }
-                foreach (var error in result.Errors)
-                {
-                    ModelState.AddModelError(string.Empty, error.Description);
-                }
+
+
+                return Ok(_accountService.CadastrarAsync(model).Result);
+
+
+            }
+            catch (CustomException cex)
+            {
+                //var eventLog = new LogEvento()
+                //{
+                //    id = Guid.NewGuid(),
+                //    message = cex.mensagemErro,
+                //    exception = cex.ToString(),
+                //    createdtime = DateTime.Now
+                //};
+
+                //_ILoggerService.InsertLog(eventLog);
+                _logger.LogError(cex.mensagemErro);
+                return BadRequest(cex.mensagemErro);
+            }
+            catch (Exception ex)
+            {
+                string erroMessage = $"Message: {ex.Message} - stack Trace: {ex.StackTrace}";
+
+                //var eventLog = new LogEvento()
+                //{
+                //    id = Guid.NewGuid(),
+                //    message = erroMessage,
+                //    exception = ex.ToString(),
+                //    createdtime = DateTime.Now
+                //};
+
+                //_ILoggerService.InsertLog(eventLog);
+                string erros = $"Message:{ex.Message} - StackTrace: {ex.StackTrace}";
+                var MessageError = "Erro nao catalogado, por favor verifique log da aplicação.";
+                _logger.LogError(erros);
+                return BadRequest(MessageError);
             }
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+            //var idUsuario = Guid.NewGuid().ToString();
+            //var user = new Usuario
+            //{
+            //    Id = idUsuario,
+            //    UserName = model.Email,
+            //    Email = model.Email,
+            //    CPF = model.Cpf,
+            //    Nome = model.Nome,
+            //    DataNascimento = model.DataNascimento,
+            //    Sexo = model.Sexo == 1 ? (int)EnumTipo.Sexo.Masculino : model.Sexo == 2 ? (int)EnumTipo.Sexo.Feminino : (int)EnumTipo.Sexo.Outros,
+            //    Endereco = new Endereco()
+            //    {
+            //        Idusuario = idUsuario,
+            //        CEP = model.CEP,
+            //        Bairro = model.Bairro,
+            //        Cidade = model.Cidade,
+            //        Estado = model.Estado,
+            //        Numero = model.Numero,
+            //        Rua = model.Rua
+            //    }
+            //};
+            //var result = await _userManager.CreateAsync(user, model.Password);
+            //if (result.Succeeded)
+            //{
+            //    _logger.LogInformation("User created a new account with password.");
+
+            //    var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
+            //    code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
+            //    var request = _httpContextAccessor.HttpContext.Request;
+
+            //    var callbackUrl = $"{request.Scheme}://{request.Host}/api/account/confirmemail?userId={user.Id}&code={code}";
+
+            //    var _usuario = await _userManager.FindByEmailAsync(model.Email);
+
+            //    _emailService.EnviarConfirmacaoEmail(_usuario, callbackUrl);
+
+            //    //-------------------atribuir role ao user------------------------------
+            //    var applicationRole = await _roleManager.FindByNameAsync("User");
+            //    if (applicationRole != null)
+            //    {
+            //        IdentityResult roleResult = await _userManager.AddToRoleAsync(user, applicationRole.Name);
+            //    }
+
+            //    //var applicationRoleUserPremium = await _roleManager.FindByNameAsync("User_Premium");
+            //    //if (applicationRoleUserPremium != null)
+            //    //{
+            //    //    IdentityResult roleResult = await _userManager.AddToRoleAsync(user, applicationRoleUserPremium.Name);
+            //    //}
+
+            //    if (_userManager.Options.SignIn.RequireConfirmedAccount)
+            //    {
+
+            //        return Ok( //$"Cadastro realizado, confirme seu email - {callbackUrl}"
+            //            new RegisterResponse()
+            //            {
+            //                user = _usuario,
+            //                urlConfirmarEmail = callbackUrl
+            //            });
+            //    }
+            //    else
+            //    {
+            //        await _signInManager.SignInAsync(user, isPersistent: false);
+            //        return Ok(new RegisterResponse()
+            //        {
+            //            user = _usuario,
+            //            urlConfirmarEmail = string.Empty
+            //        });
+            //    }
+            //}
+            //foreach (var error in result.Errors)
+            //{
+            //    ModelState.AddModelError(string.Empty, error.Description);
+            //}
+
+
             // If we got this far, something failed, redisplay form
-            return BadRequest(ModelState);
+            //return BadRequest(ModelState);
 
 
         }

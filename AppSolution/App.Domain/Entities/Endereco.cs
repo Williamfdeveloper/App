@@ -8,7 +8,7 @@ namespace App.Domain.Entities
     public class Endereco
     {
         public int CodigoEndereco { get; set; }
-        public string Id { get; set; }
+        public string Idusuario { get; set; }
         public string Rua { get; set; }
         public string Numero { get; set; }
         public string Bairro { get; set; }

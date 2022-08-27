@@ -1,8 +1,7 @@
 ﻿using App.Domain.Contracts;
-using Microsoft.AspNetCore.Identity;
+using App.Domain.Entities;
 using Microsoft.IdentityModel.Tokens;
 using System;
-using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
@@ -11,7 +10,7 @@ namespace App.Domain.Service
 {
     public class TokenService : ITokenService
     {
-        public string GenerateToken(IdentityUser user)
+        public string GenerateToken(Usuario user)
         {
             var tokenHandler = new JwtSecurityTokenHandler();
             var key = Encoding.ASCII.GetBytes(Constant.SecretJwt);

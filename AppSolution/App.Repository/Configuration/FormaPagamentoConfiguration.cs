@@ -31,19 +31,19 @@ namespace App.Repository.Configuration
                 {
                     CodigoFormaPagamento = 1,
                     DescricaoFormaPagamento = "Boleto",
-                    IdTipoFormaPagamento = (int)Enum.FormaPagamento.Boleto
+                    IdTipoFormaPagamento = (int)EnumTipo.FormaPagamento.Boleto
                 },
                 new FormaPagamento
                 {
                     CodigoFormaPagamento = 2,
                     DescricaoFormaPagamento = "Credito",
-                    IdTipoFormaPagamento = (int)Enum.FormaPagamento.Credito
+                    IdTipoFormaPagamento = (int)EnumTipo.FormaPagamento.Credito
                 },
                 new FormaPagamento
                 {
                     CodigoFormaPagamento = 3,
                     DescricaoFormaPagamento = "Debito",
-                    IdTipoFormaPagamento = (int)Enum.FormaPagamento.Debito
+                    IdTipoFormaPagamento = (int)EnumTipo.FormaPagamento.Debito
                 }
 
             );

@@ -4,7 +4,7 @@ using System.Text;
 
 namespace App.Domain
 {
-    public class Enum
+    public class EnumTipo
     {
         public enum FormaPagamento
         {

@@ -252,7 +252,7 @@ namespace App.Domain
         public static IList<TipoItemList> ListTipoLayout()
         {
             IList<TipoItemList> list = new List<TipoItemList>();
-            list.Add(new TipoItemList { Codigo = Convert.ToInt32(Enum.TipoLayout.TelaCheia), Nome = "Tela Cheia" });
+            list.Add(new TipoItemList { Codigo = Convert.ToInt32(EnumTipo.TipoLayout.TelaCheia), Nome = "Tela Cheia" });
 
 
             return list;

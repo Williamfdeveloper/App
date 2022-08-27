@@ -1,10 +1,11 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿//using App.Domain.Entities;
+//using Microsoft.AspNetCore.Identity;
 
-namespace App.Api.Model
-{
-    public class RegisterResponse
-    {
-        public IdentityUser user { get; set; }
-        public string urlConfirmarEmail { get; set; }
-    }
-}
+//namespace App.Api.Model
+//{
+//    public class RegisterResponse
+//    {
+//        public Usuario user { get; set; }
+//        public string urlConfirmarEmail { get; set; }
+//    }
+//}

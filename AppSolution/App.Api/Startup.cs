@@ -1,6 +1,7 @@
 using App.Domain;
 using App.Domain.Contracts;
 using App.Domain.Contracts.Repository;
+using App.Domain.Entities;
 using App.Domain.Service;
 using App.Repository.Context;
 using App.Repository.Repository;
@@ -19,6 +20,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -45,11 +47,12 @@ namespace App.Api
 
 
             services.AddDbContext<DefaultContext>(options => options.UseSqlServer(Configuration.GetConnectionString("SqlServerConnection")));
-            services.AddIdentity<IdentityUser, IdentityRole>().AddEntityFrameworkStores<DefaultContext>();
+            services.AddIdentity<Usuario, IdentityRole>().AddEntityFrameworkStores<DefaultContext>();
 
 
             #region IoC
             //Domain
+            services.AddTransient<IAccountService, AccountService>();
             services.AddTransient<IProdutoService, ProdutoService>();
             services.AddTransient<ITokenService, TokenService>();
             services.AddTransient<IEmailSistemaService, EmailSistemaService>();
@@ -100,13 +103,23 @@ namespace App.Api
                 };
             });
 
-            services.AddIdentityCore<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
+            services.AddIdentityCore<Usuario>(options => options.SignIn.RequireConfirmedAccount = true)
                 .AddEntityFrameworkStores<DefaultContext>()
-                .AddTokenProvider<DataProtectorTokenProvider<IdentityUser>>(TokenOptions.DefaultProvider);
+                .AddTokenProvider<DataProtectorTokenProvider<Usuario>>(TokenOptions.DefaultProvider);
+
+            services.AddMvc().AddNewtonsoftJson(o =>
+            {
+                o.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
+            });
+
+
+
+
+
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, IServiceProvider serviceProvider, UserManager<IdentityUser> userManager)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, IServiceProvider serviceProvider, UserManager<Usuario> userManager)
         {
 
             app.UseSwagger();
@@ -147,7 +160,7 @@ namespace App.Api
         private async Task CreateRoles(IServiceProvider serviceProvider)
         {
             var roleManager = serviceProvider.GetRequiredService<RoleManager<IdentityRole>>();
-            var userManager = serviceProvider.GetRequiredService<UserManager<IdentityUser>>();
+            var userManager = serviceProvider.GetRequiredService<UserManager<Usuario>>();
             string[] rolesNames = { "Admin", "User", "User_Premium" };
             IdentityResult result;
             foreach (var namesRole in rolesNames)
@@ -160,19 +173,33 @@ namespace App.Api
             }
         }
 
-        private static void SeedUsers(UserManager<IdentityUser> userManager)
+        private static void SeedUsers(UserManager<Usuario> userManager)
         {
             if (userManager.FindByNameAsync("Williamf.developer@gmail.com").Result == null)
             {
-                var user = new IdentityUser
+                var user = new Usuario
                 {
-                    Id = Guid.Parse("44276c41-f2a1-40f6-a9ce-ec0638046200").ToString(),
+                    Id = "44276c41-f2a1-40f6-a9ce-ec0638046200",
                     UserName = "Williamf.developer@gmail.com",
                     Email = "Williamf.developer@gmail.com",
                     NormalizedUserName = "WILL",
                     NormalizedEmail = "WILLIAMF.DEVELOPER@GMAIL.COM",
                     EmailConfirmed = true,
 
+                    CPF = "33167387890",
+                    Nome = "William Fernando da Silva",
+                    DataNascimento = Convert.ToDateTime("22/02/1986"),
+                    Sexo = (int)EnumTipo.Sexo.Masculino,
+                    Endereco = new Endereco()
+                    {
+                        Idusuario = "44276c41-f2a1-40f6-a9ce-ec0638046200",
+                        CEP = "13056116",
+                        Rua = "Antonio Rosique Garcia",
+                        Numero = "74",
+                        Bairro = "Jd Aeronave de Viracopos",
+                        Cidade = "Campinas",
+                        Estado = "SP"
+                    }
                 };
 
                 var password = "BR@sil500";

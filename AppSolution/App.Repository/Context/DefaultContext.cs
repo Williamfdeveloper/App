@@ -1,11 +1,14 @@
-﻿using App.Domain.Entities;
+﻿
+
+using App.Domain.Entities;
 using App.Repository.Configuration;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
 namespace App.Repository.Context
 {
-    public class DefaultContext : IdentityDbContext
+    public class DefaultContext : IdentityDbContext<Usuario, IdentityRole, string>
     {
         public DefaultContext()
         {

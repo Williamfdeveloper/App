@@ -1,12 +1,9 @@
-﻿using Microsoft.AspNetCore.Identity;
-using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using App.Domain.Entities;
 
 namespace App.Domain.Contracts
 {
     public interface ITokenService
     {
-        string GenerateToken(IdentityUser user);
+        string GenerateToken(Usuario user);
     }
 }
