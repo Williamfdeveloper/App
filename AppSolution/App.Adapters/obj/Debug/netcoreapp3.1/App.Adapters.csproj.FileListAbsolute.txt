@@ -1,0 +1,13 @@
+C:\git\App\AppSolution\App.Adapters\bin\Debug\netcoreapp3.1\App.Adapters.deps.json
+C:\git\App\AppSolution\App.Adapters\bin\Debug\netcoreapp3.1\App.Adapters.dll
+C:\git\App\AppSolution\App.Adapters\bin\Debug\netcoreapp3.1\App.Adapters.pdb
+C:\git\App\AppSolution\App.Adapters\obj\Debug\netcoreapp3.1\App.Adapters.csproj.AssemblyReference.cache
+C:\git\App\AppSolution\App.Adapters\obj\Debug\netcoreapp3.1\App.Adapters.GeneratedMSBuildEditorConfig.editorconfig
+C:\git\App\AppSolution\App.Adapters\obj\Debug\netcoreapp3.1\App.Adapters.AssemblyInfoInputs.cache
+C:\git\App\AppSolution\App.Adapters\obj\Debug\netcoreapp3.1\App.Adapters.AssemblyInfo.cs
+C:\git\App\AppSolution\App.Adapters\obj\Debug\netcoreapp3.1\App.Adapters.csproj.CoreCompileInputs.cache
+C:\git\App\AppSolution\App.Adapters\obj\Debug\netcoreapp3.1\App.Adapters.dll
+C:\git\App\AppSolution\App.Adapters\obj\Debug\netcoreapp3.1\App.Adapters.pdb
+C:\git\App\AppSolution\App.Adapters\bin\Debug\netcoreapp3.1\App.Adapters.runtimeconfig.json
+C:\git\App\AppSolution\App.Adapters\bin\Debug\netcoreapp3.1\App.Adapters.runtimeconfig.dev.json
+C:\git\App\AppSolution\App.Adapters\obj\Debug\netcoreapp3.1\App.Adapters.genruntimeconfig.cache

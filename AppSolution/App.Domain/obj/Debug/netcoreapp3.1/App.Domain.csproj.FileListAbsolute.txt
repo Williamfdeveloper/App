@@ -1,0 +1,13 @@
+C:\git\App\AppSolution\App.Domain\bin\Debug\netcoreapp3.1\App.Domain.deps.json
+C:\git\App\AppSolution\App.Domain\bin\Debug\netcoreapp3.1\App.Domain.dll
+C:\git\App\AppSolution\App.Domain\bin\Debug\netcoreapp3.1\App.Domain.pdb
+C:\git\App\AppSolution\App.Domain\obj\Debug\netcoreapp3.1\App.Domain.csproj.AssemblyReference.cache
+C:\git\App\AppSolution\App.Domain\obj\Debug\netcoreapp3.1\App.Domain.GeneratedMSBuildEditorConfig.editorconfig
+C:\git\App\AppSolution\App.Domain\obj\Debug\netcoreapp3.1\App.Domain.AssemblyInfoInputs.cache
+C:\git\App\AppSolution\App.Domain\obj\Debug\netcoreapp3.1\App.Domain.AssemblyInfo.cs
+C:\git\App\AppSolution\App.Domain\obj\Debug\netcoreapp3.1\App.Domain.csproj.CoreCompileInputs.cache
+C:\git\App\AppSolution\App.Domain\obj\Debug\netcoreapp3.1\App.Domain.dll
+C:\git\App\AppSolution\App.Domain\obj\Debug\netcoreapp3.1\App.Domain.pdb
+C:\git\App\AppSolution\App.Domain\bin\Debug\netcoreapp3.1\App.Domain.runtimeconfig.json
+C:\git\App\AppSolution\App.Domain\bin\Debug\netcoreapp3.1\App.Domain.runtimeconfig.dev.json
+C:\git\App\AppSolution\App.Domain\obj\Debug\netcoreapp3.1\App.Domain.genruntimeconfig.cache
