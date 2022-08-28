@@ -4,7 +4,6 @@ using App.Repository.Context;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 
 namespace App.Repository.Repository
 {
@@ -14,6 +13,8 @@ namespace App.Repository.Repository
         public EmailSistemaRepository(DefaultContext context)
         {
             _context = context;
+            //var options = new MemoryCacheEntryOptions() { SlidingExpiration = TimeSpan.FromHours(2) };
+            //QueryCacheManager.DefaultMemoryCacheEntryOptions = options;
         }
 
         public bool Atualizar(EmailSistema Email)

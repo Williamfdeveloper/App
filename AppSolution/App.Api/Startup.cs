@@ -55,6 +55,7 @@ namespace App.Api
             services.AddTransient<IAccountService, AccountService>();
             services.AddTransient<IProdutoService, ProdutoService>();
             services.AddTransient<ITokenService, TokenService>();
+            services.AddTransient<ILoggerService, LoggerService>();
             services.AddTransient<IEmailSistemaService, EmailSistemaService>();
             services.AddTransient<IParametrosService, ParametrosService>();
 
@@ -65,6 +66,7 @@ namespace App.Api
             services.AddTransient<IEmailSistemaRepository, EmailSistemaRepository>();
             services.AddTransient<IProdutoRepository, ProdutoRepository>();
             services.AddTransient<IParametrosRepository, ParametrosRepository>();
+            services.AddTransient<ILoggerRepository, LoggerRepository>();
 
             //services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
             #endregion

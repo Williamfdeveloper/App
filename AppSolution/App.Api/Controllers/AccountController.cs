@@ -26,6 +26,7 @@ namespace App.Api.Controllers
 
         private UserManager<Usuario> _userManager;
         private readonly ILogger<AccountController> _logger;
+        private readonly ILoggerService _loggerService;
         private readonly ITokenService _TokenService;
         private readonly IEmailSistemaService _emailService;
         private readonly IAccountService _accountService;
@@ -36,7 +37,9 @@ namespace App.Api.Controllers
 
         public IList<AuthenticationScheme> ExternalLogins { get; set; }
 
-        public AccountController(UserManager<Usuario> usrMgr,
+        public AccountController(
+            ILoggerService loggerService,
+            UserManager<Usuario> usrMgr,
             ILogger<AccountController> logger,
             RoleManager<IdentityRole> RoleManager,
             ITokenService ITokenService,
@@ -45,6 +48,7 @@ namespace App.Api.Controllers
             IHttpContextAccessor httpContextAccessor,
             IAccountService accountService)
         {
+            _loggerService = loggerService;
             _accountService = accountService;
             _httpContextAccessor = httpContextAccessor;
             _signInManager = signInManager;
@@ -68,38 +72,24 @@ namespace App.Api.Controllers
                 if (!ModelState.IsValid)
                     return View();
 
-                return Ok(_accountService.AuthenticateAsync(model).Result);
-            }
-            catch (CustomException cex)
-            {
-                //var eventLog = new LogEvento()
-                //{
-                //    id = Guid.NewGuid(),
-                //    message = cex.mensagemErro,
-                //    exception = cex.ToString(),
-                //    createdtime = DateTime.Now
-                //};
+                var t = _accountService.AuthenticateAsync(model);
 
-                //_ILoggerService.InsertLog(eventLog);
-                _logger.LogError(cex.mensagemErro);
-                return BadRequest(cex.mensagemErro);
+                t.Wait();
+
+                return Ok(t.Result);
+            }
+            catch (AggregateException cex) when (cex.InnerException is CustomException)
+            {
+                _logger.LogError(cex.ToString());
+                _loggerService.InsertLog(cex);
+                return BadRequest(cex);
             }
             catch (Exception ex)
             {
-                string erroMessage = $"Message: {ex.Message} - stack Trace: {ex.StackTrace}";
-
-                //var eventLog = new LogEvento()
-                //{
-                //    id = Guid.NewGuid(),
-                //    message = erroMessage,
-                //    exception = ex.ToString(),
-                //    createdtime = DateTime.Now
-                //};
-
-                //_ILoggerService.InsertLog(eventLog);
                 string erros = $"Message:{ex.Message} - StackTrace: {ex.StackTrace}";
                 var MessageError = "Erro nao catalogado, por favor verifique log da aplicação.";
                 _logger.LogError(erros);
+                _loggerService.InsertLog(ex);
                 return BadRequest(MessageError);
             }
         }
@@ -123,136 +113,26 @@ namespace App.Api.Controllers
                 }
 
 
-                return Ok(_accountService.CadastrarAsync(model).Result);
+                var t = _accountService.CadastrarAsync(model);
+                t.Wait();
 
+                return Ok(t.Result);
 
             }
-            catch (CustomException cex)
+            catch (AggregateException cex) when (cex.InnerException is CustomException)
             {
-                //var eventLog = new LogEvento()
-                //{
-                //    id = Guid.NewGuid(),
-                //    message = cex.mensagemErro,
-                //    exception = cex.ToString(),
-                //    createdtime = DateTime.Now
-                //};
-
-                //_ILoggerService.InsertLog(eventLog);
-                _logger.LogError(cex.mensagemErro);
-                return BadRequest(cex.mensagemErro);
+                _logger.LogError(cex.ToString());
+                _loggerService.InsertLog(cex);
+                return BadRequest(cex);
             }
             catch (Exception ex)
             {
-                string erroMessage = $"Message: {ex.Message} - stack Trace: {ex.StackTrace}";
-
-                //var eventLog = new LogEvento()
-                //{
-                //    id = Guid.NewGuid(),
-                //    message = erroMessage,
-                //    exception = ex.ToString(),
-                //    createdtime = DateTime.Now
-                //};
-
-                //_ILoggerService.InsertLog(eventLog);
                 string erros = $"Message:{ex.Message} - StackTrace: {ex.StackTrace}";
                 var MessageError = "Erro nao catalogado, por favor verifique log da aplicação.";
                 _logger.LogError(erros);
+                _loggerService.InsertLog(ex);
                 return BadRequest(MessageError);
             }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-            //var idUsuario = Guid.NewGuid().ToString();
-            //var user = new Usuario
-            //{
-            //    Id = idUsuario,
-            //    UserName = model.Email,
-            //    Email = model.Email,
-            //    CPF = model.Cpf,
-            //    Nome = model.Nome,
-            //    DataNascimento = model.DataNascimento,
-            //    Sexo = model.Sexo == 1 ? (int)EnumTipo.Sexo.Masculino : model.Sexo == 2 ? (int)EnumTipo.Sexo.Feminino : (int)EnumTipo.Sexo.Outros,
-            //    Endereco = new Endereco()
-            //    {
-            //        Idusuario = idUsuario,
-            //        CEP = model.CEP,
-            //        Bairro = model.Bairro,
-            //        Cidade = model.Cidade,
-            //        Estado = model.Estado,
-            //        Numero = model.Numero,
-            //        Rua = model.Rua
-            //    }
-            //};
-            //var result = await _userManager.CreateAsync(user, model.Password);
-            //if (result.Succeeded)
-            //{
-            //    _logger.LogInformation("User created a new account with password.");
-
-            //    var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
-            //    code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
-            //    var request = _httpContextAccessor.HttpContext.Request;
-
-            //    var callbackUrl = $"{request.Scheme}://{request.Host}/api/account/confirmemail?userId={user.Id}&code={code}";
-
-            //    var _usuario = await _userManager.FindByEmailAsync(model.Email);
-
-            //    _emailService.EnviarConfirmacaoEmail(_usuario, callbackUrl);
-
-            //    //-------------------atribuir role ao user------------------------------
-            //    var applicationRole = await _roleManager.FindByNameAsync("User");
-            //    if (applicationRole != null)
-            //    {
-            //        IdentityResult roleResult = await _userManager.AddToRoleAsync(user, applicationRole.Name);
-            //    }
-
-            //    //var applicationRoleUserPremium = await _roleManager.FindByNameAsync("User_Premium");
-            //    //if (applicationRoleUserPremium != null)
-            //    //{
-            //    //    IdentityResult roleResult = await _userManager.AddToRoleAsync(user, applicationRoleUserPremium.Name);
-            //    //}
-
-            //    if (_userManager.Options.SignIn.RequireConfirmedAccount)
-            //    {
-
-            //        return Ok( //$"Cadastro realizado, confirme seu email - {callbackUrl}"
-            //            new RegisterResponse()
-            //            {
-            //                user = _usuario,
-            //                urlConfirmarEmail = callbackUrl
-            //            });
-            //    }
-            //    else
-            //    {
-            //        await _signInManager.SignInAsync(user, isPersistent: false);
-            //        return Ok(new RegisterResponse()
-            //        {
-            //            user = _usuario,
-            //            urlConfirmarEmail = string.Empty
-            //        });
-            //    }
-            //}
-            //foreach (var error in result.Errors)
-            //{
-            //    ModelState.AddModelError(string.Empty, error.Description);
-            //}
-
-
-            // If we got this far, something failed, redisplay form
-            //return BadRequest(ModelState);
-
 
         }
 

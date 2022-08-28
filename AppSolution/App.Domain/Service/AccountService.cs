@@ -84,6 +84,7 @@ namespace App.Domain.Service
                     Rua = model.Endereco.Rua
                 }
             };
+
             var result = await _userManager.CreateAsync(user, model.Password);
             if (!result.Succeeded)
             {
