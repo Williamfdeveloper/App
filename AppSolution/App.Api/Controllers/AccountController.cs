@@ -1,6 +1,7 @@
 ﻿using App.Domain;
 using App.Domain.Contracts;
 using App.Domain.Entities;
+using App.Domain.Entities.Cartao;
 using App.Domain.Entities.Login;
 using App.Domain.Entities.Register;
 using Microsoft.AspNetCore.Authentication;
@@ -13,12 +14,13 @@ using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace App.Api.Controllers
 {
-    [AllowAnonymous]
+    [Authorize(Roles = "User")]
     [ApiController]
     [Route("api/[controller]")]
     public class AccountController : Controller
@@ -28,6 +30,7 @@ namespace App.Api.Controllers
         private readonly ILogger<AccountController> _logger;
         private readonly ILoggerService _loggerService;
         private readonly ITokenService _TokenService;
+        private readonly IDadosCartaoService _dadosCartaoService;
         private readonly IEmailSistemaService _emailService;
         private readonly IAccountService _accountService;
         private readonly RoleManager<IdentityRole> _roleManager;
@@ -43,11 +46,13 @@ namespace App.Api.Controllers
             ILogger<AccountController> logger,
             RoleManager<IdentityRole> RoleManager,
             ITokenService ITokenService,
+            IDadosCartaoService dadosCartaoService,
             IEmailSistemaService emailService,
             SignInManager<Usuario> signInManager,
             IHttpContextAccessor httpContextAccessor,
             IAccountService accountService)
         {
+            _dadosCartaoService = dadosCartaoService;
             _loggerService = loggerService;
             _accountService = accountService;
             _httpContextAccessor = httpContextAccessor;
@@ -81,16 +86,23 @@ namespace App.Api.Controllers
             catch (AggregateException cex) when (cex.InnerException is CustomException)
             {
                 _logger.LogError(cex.ToString());
-                _loggerService.InsertLog(cex);
-                return BadRequest(cex);
+                //var retorno = Content(_loggerService.InsertLog(cex).mensagemErro);
+                //retorno.StatusCode = (int)HttpStatusCode.InternalServerError;
+
+                //return retorno;
+                return BadRequest(_loggerService.InsertLog(cex).mensagemErro);
             }
             catch (Exception ex)
             {
-                string erros = $"Message:{ex.Message} - StackTrace: {ex.StackTrace}";
-                var MessageError = "Erro nao catalogado, por favor verifique log da aplicação.";
-                _logger.LogError(erros);
+                string erro = $"Message:{ex.Message} - StackTrace: {ex.StackTrace}";
+                //var MessageError = "Erro nao catalogado, por favor verifique log da aplicação.";
+                _logger.LogError(erro);
                 _loggerService.InsertLog(ex);
-                return BadRequest(MessageError);
+
+                var retorno = Content(erro);
+                retorno.StatusCode = (int)HttpStatusCode.InternalServerError;
+
+                return retorno;
             }
         }
 
@@ -122,16 +134,23 @@ namespace App.Api.Controllers
             catch (AggregateException cex) when (cex.InnerException is CustomException)
             {
                 _logger.LogError(cex.ToString());
-                _loggerService.InsertLog(cex);
-                return BadRequest(cex);
+                //var retorno = Content(_loggerService.InsertLog(cex).mensagemErro);
+                //retorno.StatusCode = (int)HttpStatusCode.InternalServerError;
+
+                //return retorno;
+                return BadRequest(_loggerService.InsertLog(cex).mensagemErro);
             }
             catch (Exception ex)
             {
-                string erros = $"Message:{ex.Message} - StackTrace: {ex.StackTrace}";
-                var MessageError = "Erro nao catalogado, por favor verifique log da aplicação.";
-                _logger.LogError(erros);
+                string erro = $"Message:{ex.Message} - StackTrace: {ex.StackTrace}";
+                //var MessageError = "Erro nao catalogado, por favor verifique log da aplicação.";
+                _logger.LogError(erro);
                 _loggerService.InsertLog(ex);
-                return BadRequest(MessageError);
+
+                var retorno = Content(erro);
+                retorno.StatusCode = (int)HttpStatusCode.InternalServerError;
+
+                return retorno;
             }
 
         }
@@ -152,6 +171,51 @@ namespace App.Api.Controllers
             var result = await _userManager.ConfirmEmailAsync(user, code);
             return Ok(result.Succeeded ? "Thank you for confirming your email." : "Error confirming your email.");
         }
+
+        [HttpPost]
+        [Route("adicionarCartao")]
+        [Authorize(Roles = "User")]
+        public ActionResult AdicionarCartao([FromBody] CartaoModel cartao)
+        {
+            try
+            {
+                var usuario = _userManager.FindByNameAsync(User.Identity.Name).Result;
+                if (usuario == null)
+                    throw new CustomException() { mensagemErro = "Usuario não identificado, por gentileza, efetue o Login." };
+
+                var t = _dadosCartaoService.AdicionarCartao(cartao, usuario);
+                t.Wait();
+
+                if (t.Result)
+                    return Ok("Cartão adicionado com sucesso!");
+                else
+                    return BadRequest("Falha ao adicionar cartão");
+            }
+            catch (AggregateException cex) when (cex.InnerException is CustomException)
+            {
+                _logger.LogError(cex.ToString());
+                //var retorno = Content(_loggerService.InsertLog(cex).mensagemErro);
+                //retorno.StatusCode = (int)HttpStatusCode.InternalServerError;
+
+                //return retorno;
+                return BadRequest(_loggerService.InsertLog(cex).mensagemErro);
+            }
+            catch (Exception ex)
+            {
+                string erro = $"Message:{ex.Message} - StackTrace: {ex.StackTrace}";
+                //var MessageError = "Erro nao catalogado, por favor verifique log da aplicação.";
+                _logger.LogError(erro);
+                _loggerService.InsertLog(ex);
+
+                var retorno = Content(erro);
+                retorno.StatusCode = (int)HttpStatusCode.InternalServerError;
+
+                return retorno;
+            }
+        }
+
+
+
 
         [HttpGet]
         [Route("anonymous")]

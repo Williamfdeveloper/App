@@ -14,6 +14,7 @@ namespace App.Domain.Entities
         public int CodigoPedido { get; set; }
         public int CodigoPedidoItem { get; set; }
         public int CodigoProduto { get; set; }
+        public string DescricaoProduto { get; set; }
         public int Quantidade { get; set; }
         public decimal ValorUnitario { get; set; }
         public decimal ValorTotal { get; set; }

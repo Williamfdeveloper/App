@@ -16,10 +16,10 @@ namespace App.Domain.Service
             _ILoggerRepository = ILoggerRepository;
         }
 
-        public void InsertLog(Exception ex)
+        public CustomException InsertLog(Exception ex)
         {
             if (ex == null)
-                return;
+                return null;
 
             var cex = ex.InnerException as CustomException;
 
@@ -41,12 +41,11 @@ namespace App.Domain.Service
                 message = ex.Message
             };
 
-            _ILoggerRepository.InsertLog(LogEvento);
+            if (_ILoggerRepository.InsertLog(LogEvento) && cex != null)
+                return cex;
+            else
+                return null;
         }
 
-        //public bool IsEnabled(LogLevel logLevel)
-        //{
-        //    return (_filtro == null || _filtro(_nomeCategoria, logLevel));
-        //}
     }
 }

@@ -54,21 +54,24 @@ namespace App.Api
             //Domain
             services.AddTransient<IAccountService, AccountService>();
             services.AddTransient<IProdutoService, ProdutoService>();
+            services.AddTransient<IDadosCartaoService, DadosCartaoService>();
             services.AddTransient<ITokenService, TokenService>();
             services.AddTransient<ILoggerService, LoggerService>();
             services.AddTransient<IEmailSistemaService, EmailSistemaService>();
             services.AddTransient<IParametrosService, ParametrosService>();
+            services.AddTransient<IPedidoService, PedidoService>();
 
             //Adapter
             //services.AddSingleton<IUsuarioAdapter, UsuarioAdapter>();
 
             //Repository
+            services.AddTransient<IDadosCartaoRepository, DadosCartaoRepository>();
             services.AddTransient<IEmailSistemaRepository, EmailSistemaRepository>();
             services.AddTransient<IProdutoRepository, ProdutoRepository>();
             services.AddTransient<IParametrosRepository, ParametrosRepository>();
             services.AddTransient<ILoggerRepository, LoggerRepository>();
 
-            //services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+            services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
             #endregion
 
             services.AddSwaggerGen(c =>

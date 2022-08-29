@@ -11,6 +11,8 @@ namespace App.Domain
 {
     public static class Util
     {
+        
+
         public static string CryptoGrafiaSenha(string senha)
         {
             // Calcular o Hash
@@ -38,6 +40,59 @@ namespace App.Domain
 
             //return senhaCrypto;
         }
+
+        public static bool ValidarCartao(string numeroCartao, string bandeira)
+        {
+            string nrCartao = numeroCartao.Replace("-", "");
+            switch (bandeira.ToUpper())
+            {
+                case "VISA":
+                    if (Regex.IsMatch(nrCartao, "^(4)"))
+                        return nrCartao.Length == 13 || nrCartao.Length == 16;
+                    break;
+                case "MASTERCARD":
+                    if (Regex.IsMatch(nrCartao, "^(51|52|53|54|55)"))
+                        return nrCartao.Length == 16;
+                    break;
+                case "AMEX":
+                    if (Regex.IsMatch(nrCartao, "^(34|37)"))
+                        return nrCartao.Length == 15;
+                    break;
+                case "DINERS":
+                    if (Regex.IsMatch(nrCartao, "^(300|301|302|303|304|305|36|38)"))
+                        return nrCartao.Length == 14;
+                    break;
+            }
+
+            return false;
+        }
+
+
+        public static bool checkLuhn(string value)
+        {
+            // remove all non digit characters
+            //var value = value.replace(/\D / g, '');
+            var apenasDigitos = new Regex(@"[^\d]");
+            value = apenasDigitos.Replace(value, "");
+
+            var sum = 0;
+            var shouldDouble = false;
+            // loop through values starting at the rightmost side
+            for (var i = 0; i < value.Length; i++)
+            {
+                var digit = Convert.ToInt32(value.Substring(i, 1));
+
+                if (shouldDouble)
+                {
+                    if ((digit *= 2) > 9) digit -= 9;
+                }
+
+                sum += digit;
+                shouldDouble = !shouldDouble;
+            }
+            return (sum % 10) == 0;
+        }
+
 
         public static void ValidarSqlInject(string texto)
         {
@@ -211,7 +266,7 @@ namespace App.Domain
             return regex.IsMatch(email);
         }
 
-    
+
         public static double dias() //Pede uma data como parâmetro
         {
             DateTime dataInicial = new DateTime(DateTime.Now.Year, 1, 1);
@@ -271,6 +326,22 @@ namespace App.Domain
             return bValido;
 
         }
+
+        public static string ConverterNumeroCartao(string numero)
+        {
+            StringBuilder sbcartao = new StringBuilder();
+
+            for (int i = 0; i < numero.Length; i++)
+            {
+                if (i < 12)
+                    sbcartao.Append("*");
+                else
+                    sbcartao.Append(numero.Substring(i - 1, 1));
+
+            }
+            return sbcartao.ToString();
+        }
+
 
         static readonly string PasswordHash = "VOjA@Orh@xB$Ft7dD$KlCL04Jb#f^0frTWLoOF^U"; //"P@@Sw0rd";
         static readonly string SaltKey = "P&$KgGDR72!luc&x6!dbeWqdhKt9AcP*@HajnGo8";//"S@LT&KEY";

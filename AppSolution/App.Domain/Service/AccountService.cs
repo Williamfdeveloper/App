@@ -60,7 +60,6 @@ namespace App.Domain.Service
             //if (!string.IsNullOrEmpty(model.Nome))
             //    throw new CustomException() { mensagemErro = "Para se cadastrar voce deve informar o nome." };
 
-
             ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
 
             var idUsuario = Guid.NewGuid().ToString();

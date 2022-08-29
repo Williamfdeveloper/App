@@ -18,7 +18,7 @@ namespace App.Repository.Context
 
         }
         
-        public virtual DbSet<Cartao> Cartao { get; set; }
+        public virtual DbSet<DadosCartao> DadosCartao { get; set; }
         public virtual DbSet<EmailSistema> EmailSistema { get; set; }
         public virtual DbSet<Endereco> Endereco { get; set; }
         public virtual DbSet<FormaPagamento> FormaPagamento { get; set; }

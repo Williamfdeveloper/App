@@ -7,6 +7,6 @@ namespace App.Domain.Contracts
 {
     public interface ILoggerService
     {
-        void InsertLog(Exception ex);
+        CustomException InsertLog(Exception ex);
     }
 }

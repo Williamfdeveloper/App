@@ -150,3 +150,5 @@ C:\git\App\AppSolution\App.Test\bin\Debug\netcoreapp3.1\System.Security.Cryptogr
 C:\git\App\AppSolution\App.Test\bin\Debug\netcoreapp3.1\System.Security.Cryptography.Xml.dll
 C:\git\App\AppSolution\App.Test\bin\Debug\netcoreapp3.1\System.Security.Permissions.dll
 C:\git\App\AppSolution\App.Test\bin\Debug\netcoreapp3.1\runtimes\win\lib\netcoreapp2.1\System.Security.Cryptography.Pkcs.dll
+C:\git\App\AppSolution\App.Test\bin\Debug\netcoreapp3.1\RabbitMQ.Client.dll
+C:\git\App\AppSolution\App.Test\bin\Debug\netcoreapp3.1\System.Threading.Channels.dll

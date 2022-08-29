@@ -7,6 +7,6 @@ namespace App.Domain.Contracts.Repository
 {
     public interface ILoggerRepository
     {
-        void InsertLog(LogEvento LogEvento);
+        bool InsertLog(LogEvento LogEvento);
     }
 }

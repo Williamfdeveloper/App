@@ -9,7 +9,11 @@ namespace App.Domain.Entities
     {
         public int CodigoFormaPagamento { get; set; }
         public string DescricaoFormaPagamento { get; set; }
+        public int QuantidadeParcelas { get; set; }
+        public decimal ValorDesconto { get; set; }
+        public int TipoDesconto { get; set; }
         public int IdTipoFormaPagamento{ get; set; }
+        public bool Ativa { get; set; }
 
     }
 }

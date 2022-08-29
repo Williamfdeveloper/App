@@ -45,5 +45,10 @@ namespace App.Domain
         {
             TelaCheia = 1
         }
+        public enum TipoDesconto
+        {
+            Porcentagem = 1,
+            Valor = 2
+        }
     }
 }

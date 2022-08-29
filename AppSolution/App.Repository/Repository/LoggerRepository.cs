@@ -15,10 +15,13 @@ namespace App.Repository.Repository
             _context = context;
         }
 
-        public void InsertLog(LogEvento LogEvento)
+        public bool InsertLog(LogEvento LogEvento)
         {
             _context.LogEvento.Add(LogEvento);
-            _context.SaveChanges();
+            if (_context.SaveChanges() > 0)
+                return true;
+            else
+                return false;
         }
     }
 }

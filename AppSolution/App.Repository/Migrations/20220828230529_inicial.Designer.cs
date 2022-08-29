@@ -10,8 +10,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace App.Repository.Migrations
 {
     [DbContext(typeof(DefaultContext))]
-    [Migration("20220827231503_update")]
-    partial class update
+    [Migration("20220828230529_inicial")]
+    partial class inicial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -21,37 +21,40 @@ namespace App.Repository.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128)
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-            modelBuilder.Entity("App.Domain.Entities.Cartao", b =>
+            modelBuilder.Entity("App.Domain.Entities.DadosCartao", b =>
                 {
-                    b.Property<int>("CodigoCartao")
+                    b.Property<int>("CodigoDadosCartao")
                         .ValueGeneratedOnAdd()
                         .HasColumnName("CD_CARTAO")
                         .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<Guid>("CodigoUsuario")
+                    b.Property<string>("CodigoUsuario")
+                        .IsRequired()
                         .HasColumnName("CD_USUARIO")
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTime>("DataVencimentoCartao")
+                    b.Property<string>("DataVencimentoCartao")
+                        .IsRequired()
                         .HasColumnName("DT_VENCIMENTO")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("HashCartao")
                         .IsRequired()
                         .HasColumnName("DC_HASH_CARTAO")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("NumeroCatao")
+                    b.Property<string>("NomeCartao")
+                        .IsRequired()
+                        .HasColumnName("DC_NOME_CARTAO")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("NumeroCartao")
                         .IsRequired()
                         .HasColumnName("DC_NUMERO_CARTAO")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("SenhaCartao")
-                        .HasColumnName("DC_SENHA")
-                        .HasColumnType("int");
-
-                    b.HasKey("CodigoCartao");
+                    b.HasKey("CodigoDadosCartao");
 
                     b.ToTable("TB_PESSOA_CARTAO","dbo");
                 });
@@ -96,7 +99,7 @@ namespace App.Repository.Migrations
                     b.HasData(
                         new
                         {
-                            ID = new Guid("f7d81e28-6553-4389-b310-9c6b54efb85d"),
+                            ID = new Guid("ab5bc78f-006d-4f4b-acc7-e6706246d19f"),
                             PrimaryDomain = "mail.v2wstore.com.br",
                             PrimaryPort = 465,
                             ServerNameDisplay = "V2WMedia",
@@ -261,7 +264,7 @@ namespace App.Repository.Migrations
                     b.HasData(
                         new
                         {
-                            parametrosid = new Guid("5a414f88-ac93-407f-80a1-80ab0872e3bd"),
+                            parametrosid = new Guid("50ce051b-df37-4396-8064-0341d932e24a"),
                             descricao = "Template para enviar email de reset de senha",
                             nome = "HtmlTemplateEmailDefault",
                             tipocampo = 1,
@@ -269,7 +272,7 @@ namespace App.Repository.Migrations
                         },
                         new
                         {
-                            parametrosid = new Guid("43ddda12-2534-4902-b868-9d3cd62cddda"),
+                            parametrosid = new Guid("131ac121-a6cd-4a4e-ac8c-a23e83608dda"),
                             descricao = "Email para contato",
                             nome = "EmailContato",
                             tipocampo = 1,
@@ -277,7 +280,7 @@ namespace App.Repository.Migrations
                         },
                         new
                         {
-                            parametrosid = new Guid("6d21ceb0-6a28-474a-8e2f-09f045b5f1de"),
+                            parametrosid = new Guid("36470715-457c-4210-97ad-65493e95b291"),
                             descricao = "logo para email",
                             nome = "LogoEmail",
                             tipocampo = 1,
@@ -285,7 +288,7 @@ namespace App.Repository.Migrations
                         },
                         new
                         {
-                            parametrosid = new Guid("96bc0782-34a0-4a1f-bae7-e1b40a3696f2"),
+                            parametrosid = new Guid("9521f1f4-f6f5-49bb-a337-806f6c958259"),
                             descricao = "Parametro para validar se deve ser enviado Email de reset de senha",
                             nome = "ParametroEnviarEmailResetSenha",
                             tipocampo = 1,
@@ -293,7 +296,7 @@ namespace App.Repository.Migrations
                         },
                         new
                         {
-                            parametrosid = new Guid("9cb00993-cc7d-413b-921b-f549605925a6"),
+                            parametrosid = new Guid("55beaf1c-2809-492e-89f6-61ee1bb45fe6"),
                             descricao = "Parametro para validar se deve ser enviado Email de Confirmação de email",
                             nome = "ParametroEnviarConfirmacaoEmail",
                             tipocampo = 1,
@@ -301,7 +304,7 @@ namespace App.Repository.Migrations
                         },
                         new
                         {
-                            parametrosid = new Guid("18054dd0-cda8-4084-8da9-eb8ef92452c5"),
+                            parametrosid = new Guid("61610b1a-aeb5-438f-8dca-4b7d8cf853af"),
                             descricao = "Parametro para validar como será salvo as imagens 1 - Banco | 2 Arquivo",
                             nome = "ParametroTipoImagem",
                             tipocampo = 1,
@@ -309,7 +312,7 @@ namespace App.Repository.Migrations
                         },
                         new
                         {
-                            parametrosid = new Guid("4654acbd-83e9-4b8a-bfd9-2a3a33f5e6f9"),
+                            parametrosid = new Guid("b1dfc010-7470-4157-8aa7-dbaa257e91e6"),
                             descricao = "Parametro utilizado para identificar qual a pasta que será salvo as imagens.",
                             nome = "ParametroCaminhoPastaArquivo",
                             tipocampo = 1,
