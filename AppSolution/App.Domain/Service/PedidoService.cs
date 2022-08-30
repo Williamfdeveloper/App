@@ -1,4 +1,5 @@
 ﻿using App.Domain.Contracts;
+using App.Domain.Contracts.Repository;
 using App.Domain.Entities;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
@@ -9,6 +10,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Transactions;
 
 namespace App.Domain.Service
 {
@@ -23,7 +25,8 @@ namespace App.Domain.Service
         private readonly ILoggerService _loggerService;
         private readonly IProdutoService _produtoService;
         private readonly IFormasPagamentoService _formasPagamentoService;
-        //private ISession _session => _httpContextAccessor.HttpContext.Session;
+        private readonly IPedidoRepository _pedidoRepository;
+        private readonly IMessageQueueService _messageQueueService;
 
         public PedidoService(
             ILoggerService loggerService,
@@ -33,7 +36,9 @@ namespace App.Domain.Service
             SignInManager<Usuario> signInManager,
             IHttpContextAccessor httpContextAccessor,
             IProdutoService produtoService,
-            IFormasPagamentoService formasPagamentoService)
+            IFormasPagamentoService formasPagamentoService,
+            IPedidoRepository pedidoRepository,
+            IMessageQueueService messageQueueService)
         {
             _loggerService = loggerService;
             _logger = logger;
@@ -43,6 +48,8 @@ namespace App.Domain.Service
             _userManager = usrMgr;
             _produtoService = produtoService;
             _formasPagamentoService = formasPagamentoService;
+            _pedidoRepository = pedidoRepository;
+            _messageQueueService = messageQueueService;
         }
 
         public PedidoService(IProdutoService produtoService, IHttpContextAccessor httpContextAccessor)
@@ -51,132 +58,104 @@ namespace App.Domain.Service
             _produtoService = produtoService;
         }
 
-        public bool AdicionarItemCarrinho(int produtoID, int quantidade, Usuario usuario, ref Pedido pedido)
+        //private static Pedido GerarPedidoInicial(Usuario usuario, ICollection<PedidoItem> Pedidoitem = null)
+        //{
+        //    var dataAtual = DateTime.Now;
+
+        //    Pedido pedido = new Pedido();
+        //    pedido.CodigoUsuario = usuario.Id;
+
+        //    pedido.ValorTotal = Pedidoitem.Sum(c => c.ValorTotal);
+
+        //    pedido.ValorTotalComDesconto = 0;
+        //    pedido.QuatidadeItensVenda = Pedidoitem.Count;
+        //    pedido.DataPedido = dataAtual;
+        //    pedido.DataAprovacaoPedido = DateTime.MinValue;
+        //    pedido.SituacaoPedido = (int)EnumTipo.SituacaoPedido.EmCaptacao;
+        //    pedido.CupomDesconto = string.Empty;
+        //    pedido.FormaPagamentoid = (int)EnumTipo.FormaPagamento.Credito;
+
+        //    if (Pedidoitem != null && Pedidoitem.Count > 0)
+        //    {
+        //        var _item = new List<PedidoItem>();
+        //        foreach (var item in Pedidoitem)
+        //        {
+        //            //item.CodigoPedido = pedido.CodigoPedido;
+        //            _item.Add(item);
+        //        }
+
+        //        pedido.PedidoItem = _item;
+
+        //    }
+
+        //    IList<PedidoHistorico> ListaPedidoHistorico = new List<PedidoHistorico>();
+        //    ListaPedidoHistorico.Add(new PedidoHistorico()
+        //    {
+        //        DataSituacao = dataAtual,
+        //        DataAtualizacaoInicio = dataAtual,
+        //        IdSituacaoPedido = (int)EnumTipo.SituacaoPedido.EmCaptacao,
+        //    });
+
+        //    pedido.PedidoHistorico = ListaPedidoHistorico;
+
+        //    return pedido;
+        //}
+
+        public Task<bool> CaptarPedido(ref Pedido Pedido)
         {
-            if (produtoID <= 0)
-                throw new CustomException() { mensagemErro = "Codigo item invalido" };
+            DateTime data = DateTime.Now;
+            if (Pedido == null)
+                throw new CustomException() { mensagemErro = "Objeto pedido não informado." };
 
-            var item = _produtoService.BuscarProduto(produtoID);
-            if (item == null)
-                throw new CustomException() { mensagemErro = "Item não encontrado" };
+            if (Pedido.DataPedido == null)
+                throw new CustomException() { mensagemErro = "Data pedido não informado." };
 
-            ICollection<PedidoItem> Items = new List<PedidoItem>();
-            //var ItemContext = _session.GetString($"Pedido-{usuario.Id}");
+            if (Pedido.ValorTotal == 0)
+                throw new CustomException() { mensagemErro = "Valor do pedido não informado." };
 
-            if (pedido == null)
+            if (string.IsNullOrEmpty(Pedido.CodigoUsuario))
+                throw new CustomException() { mensagemErro = "Usuario não informdo no pedido." };
+
+            if (Pedido.FormaPagamento == null)
+                throw new CustomException() { mensagemErro = "Codigo da forma de pagamento do pedido não informado." };
+
+            if (Pedido.SituacaoPedido == 0)
+                throw new CustomException() { mensagemErro = "Status do pedido invalido." };
+
+            if (Pedido.PedidoItem == null || Pedido.PedidoItem.Count() == 0)
+                throw new CustomException() { mensagemErro = "Itens do pedido não informado." };
+
+            if (Pedido.PedidoHistorico == null || Pedido.PedidoHistorico.Count() == 0)
+                throw new CustomException() { mensagemErro = "Historico do pedido não informado." };
+
+            if (Pedido.FormaPagamento.CodigoFormaPagamento != (int)EnumTipo.FormaPagamento.Credito)
+                throw new CustomException() { mensagemErro = "Forma de pagamenmto nao autorizada." };
+
+            Pedido.DataCaptacaoPedido = data;
+
+            Pedido.PedidoHistorico.Add(new PedidoHistorico()
             {
-                PedidoItem PedidoItem = new PedidoItem();
-                //PedidoItem.itempedidoid = Guid.NewGuid();
-                PedidoItem.CodigoProduto = item.CodigoProduto;
-                PedidoItem.DescricaoProduto = item.Descricao;
-                PedidoItem.Quantidade = quantidade;
-                PedidoItem.ValorUnitario = item.Valor;
-                PedidoItem.ValorTotal = quantidade * item.Valor;
-
-                Items.Add(PedidoItem);
-                pedido = GerarPedidoInicial(usuario, Items);
-
-                //_session.SetString($"Pedido-{usuario.Id}", JsonConvert.SerializeObject(pedido));
-            }
-            else
-            {
-                //var _pedido = JsonConvert.DeserializeObject<Pedido>(ItemContext);
-
-                if (pedido.PedidoItem != null)
-                {
-                    Items = pedido.PedidoItem;
-                    bool Add = true;
-                    foreach (var itemLista in Items)
-                    {
-                        if (itemLista.CodigoProduto == item.CodigoProduto)
-                        {
-                            itemLista.DescricaoProduto = item.Descricao;
-                            itemLista.Quantidade = quantidade;
-                            itemLista.ValorUnitario = item.Valor;
-                            itemLista.ValorTotal = quantidade * item.Valor;
-                            Add = false;
-                        }
-                    }
-
-                    if (Add)
-                    {
-                        PedidoItem PedidoItem = new PedidoItem();
-                        //PedidoItem.itempedidoid = Guid.NewGuid();
-                        PedidoItem.DescricaoProduto = item.Descricao;
-                        PedidoItem.Quantidade = quantidade;
-                        PedidoItem.ValorUnitario = item.Valor;
-                        PedidoItem.ValorTotal = quantidade * item.Valor;
-                        PedidoItem.CodigoPedido = item.CodigoProduto;
-
-                        pedido.PedidoItem.Add(PedidoItem);
-                    }
-
-                    //_session.Remove($"Pedido-{usuario.Id}");
-                    //_session.SetString($"Pedido-{usuario.Id}", JsonConvert.SerializeObject(_pedido));
-                }
-                else
-                {
-                    PedidoItem PedidoItem = new PedidoItem();
-                    //PedidoItem.itempedidoid = Guid.NewGuid();
-                    PedidoItem.DescricaoProduto = item.Descricao;
-                    PedidoItem.Quantidade = quantidade;
-                    PedidoItem.ValorUnitario = item.Valor;
-                    PedidoItem.ValorTotal = quantidade * item.Valor;
-                    //PedidoItem.itemid = item.itemid;
-                    //PedidoItem.imagemid = item.imagem[0].imagemid;
-                    pedido.PedidoItem.Add(PedidoItem);
-
-
-                    //_session.Remove($"Pedido-{usuario.Id}");
-                    //_session.SetString($"Pedido-{usuario.Id}", JsonConvert.SerializeObject(_pedido));
-                }
-                
-            }
-            return true;
-        }
-
-
-        public static Pedido GerarPedidoInicial(Usuario usuario, ICollection<PedidoItem> Pedidoitem = null)
-        {
-            var dataAtual = DateTime.Now;
-
-            Pedido pedido = new Pedido();
-            pedido.CodigoUsuario = usuario.Id;
-
-            pedido.ValorTotal = Pedidoitem.Sum(c => c.ValorTotal);
-
-            pedido.ValorTotalComDesconto = 0;
-            pedido.QuatidadeItensVenda = Pedidoitem.Count;
-            pedido.DataPedido = dataAtual;
-            pedido.DataAprovacaoPedido = DateTime.MinValue;
-            pedido.SituacaoPedido = (int)EnumTipo.SituacaoPedido.EmCaptacao;
-            pedido.CupomDesconto = string.Empty;
-            pedido.FormaPagamentoid = (int)EnumTipo.FormaPagamento.Credito;
-
-            if (Pedidoitem != null && Pedidoitem.Count > 0)
-            {
-                var _item = new List<PedidoItem>();
-                foreach (var item in Pedidoitem)
-                {
-                    //item.CodigoPedido = pedido.CodigoPedido;
-                    _item.Add(item);
-                }
-
-                pedido.PedidoItem = _item;
-
-            }
-
-            IList<PedidoHistorico> ListaPedidoHistorico = new List<PedidoHistorico>();
-            ListaPedidoHistorico.Add(new PedidoHistorico()
-            {
-                DataSituacao = dataAtual,
-                DataAtualizacaoInicio = dataAtual,
+                DataSituacao = data,
                 IdSituacaoPedido = (int)EnumTipo.SituacaoPedido.EmCaptacao,
+                DataAtualizacaoInicio = data,
+                DataAtualizacaoFim = data
             });
 
-            pedido.PedidoHistorico = ListaPedidoHistorico;
+            Pedido.FormaPagamento = null;
 
-            return pedido;
+            if (_pedidoRepository.Salvar(ref Pedido))
+                return _messageQueueService.PostMessageQueue(Pedido, (int)EnumTipo.Queue.Pedido);
+
+            return Task.FromResult(false);
         }
+
+        public Task<Pedido> ConsultarPedido(int CodigoPedido)
+        {
+            if (CodigoPedido <= 0)
+                throw new CustomException() { mensagemErro = "Codigo pedido inválido." };
+
+            return Task.FromResult(_pedidoRepository.Buscar(CodigoPedido));
+        }
+
     }
 }

@@ -229,15 +229,18 @@ namespace App.Api.Controllers
 
         [HttpGet]
         [Route("User")]
-        [Authorize(Roles = "employee,manager")]
-        public string Employee() => "Funcionário";
+        [Authorize(Roles = "User,Admin")]
+        public string Usuario() => "Usuario";
+
+        [HttpGet]
+        [Route("Admin")]
+        [Authorize(Roles = "Admin")]
+        public string Admin() => "Admin";
 
         [HttpGet]
         [Route("User_Premium")]
-        [Authorize(Roles = "manager")]
-        public string Manager() => "Gerente";
-
-
+        [Authorize(Roles = "User_Premium")]
+        public string UserPremium() => "Usuario Premium";
 
 
     }

@@ -19,7 +19,7 @@ namespace App.Domain.Entities
         public decimal ValorUnitario { get; set; }
         public decimal ValorTotal { get; set; }
 
-        public virtual ICollection<Produto> Produtos { get; set; }
+        //public virtual IList<Produto> Produtos { get; set; }
 
     }
 }

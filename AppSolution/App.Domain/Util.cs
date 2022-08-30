@@ -11,7 +11,7 @@ namespace App.Domain
 {
     public static class Util
     {
-        
+
 
         public static string CryptoGrafiaSenha(string senha)
         {
@@ -264,16 +264,6 @@ namespace App.Domain
             string pattern = @"^(?!\.)(""([^""\r\\]|\\[""\r\\])*""|" + @"([-a-z0-9!#$%&'*+/=?^_`{|}~]|(?<!\.)\.)*)(?<!\.)" + @"@[a-z0-9][\w\.-]*[a-z0-9]\.[a-z][a-z\.]*[a-z]$";
             var regex = new Regex(pattern, RegexOptions.IgnoreCase);
             return regex.IsMatch(email);
-        }
-
-
-        public static double dias() //Pede uma data como parâmetro
-        {
-            DateTime dataInicial = new DateTime(DateTime.Now.Year, 1, 1);
-            DateTime dataFinal = new DateTime(DateTime.Now.AddYears(1).Year, 1, 1);
-            var dias = (dataFinal - dataInicial).TotalDays; //Retorna os dias. É preciso fazer o cast porque vem em double
-
-            return dias / 12;
         }
 
         public static string EncodeBase64(string value)

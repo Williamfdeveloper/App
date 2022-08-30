@@ -24,6 +24,7 @@ namespace App.Repository.Configuration
             builder.Property(e => e.ValorTotalComDesconto).HasColumnName("MO_VALOR_TOTAL_COM_DESCONTO").IsRequired().HasColumnType("decimal(18,2)");
             builder.Property(e => e.QuatidadeItensVenda).HasColumnName("QT_ITENS_VENDA").IsRequired();
             builder.Property(e => e.DataPedido).HasColumnName("DH_PEDIDO").IsRequired();
+            builder.Property(e => e.DataCaptacaoPedido).HasColumnName("DH_CAPTACAO_PEDIDO").IsRequired();
             builder.Property(e => e.DataAprovacaoPedido).HasColumnName("DH_APROVACAO_PEDIDO").IsRequired();
             builder.Property(e => e.SituacaoPedido).HasColumnName("ID_SITUACAO_PEDIDO").IsRequired();
             builder.Property(e => e.CupomDesconto).HasColumnName("DC_CUPOM").IsRequired();

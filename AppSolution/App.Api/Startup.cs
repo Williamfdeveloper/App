@@ -57,9 +57,11 @@ namespace App.Api
             services.AddTransient<IDadosCartaoService, DadosCartaoService>();
             services.AddTransient<ITokenService, TokenService>();
             services.AddTransient<ILoggerService, LoggerService>();
+            services.AddTransient<IFormasPagamentoService, FormasPagamentoService>();
             services.AddTransient<IEmailSistemaService, EmailSistemaService>();
             services.AddTransient<IParametrosService, ParametrosService>();
             services.AddTransient<IPedidoService, PedidoService>();
+            services.AddTransient<IMessageQueueService, MessageQueueService>();
 
             //Adapter
             //services.AddSingleton<IUsuarioAdapter, UsuarioAdapter>();
@@ -70,6 +72,8 @@ namespace App.Api
             services.AddTransient<IProdutoRepository, ProdutoRepository>();
             services.AddTransient<IParametrosRepository, ParametrosRepository>();
             services.AddTransient<ILoggerRepository, LoggerRepository>();
+            services.AddTransient<IPedidoRepository, PedidoRepository>();
+            services.AddTransient<IFormasPagamentoRepository, FormasPagamentoRepository>();
 
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
             #endregion
@@ -116,6 +120,7 @@ namespace App.Api
             {
                 o.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
             });
+
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

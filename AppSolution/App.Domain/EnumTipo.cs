@@ -16,9 +16,10 @@ namespace App.Domain
         public enum SituacaoPedido
         {
             EmCaptacao = 1,
-            Finalizado = 2,
-            Cancelado = 3,
-            Entregue = 4
+            EmAprovacao = 2,
+            Finalizado = 3,
+            Cancelado = 4,
+            Entregue = 5
         }
 
         public enum SituacaoPedidoPagamento
@@ -49,6 +50,11 @@ namespace App.Domain
         {
             Porcentagem = 1,
             Valor = 2
+        }
+
+        public enum Queue
+        {
+            Pedido = 1
         }
     }
 }

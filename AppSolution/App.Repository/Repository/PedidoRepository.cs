@@ -16,8 +16,7 @@ namespace App.Repository.Repository
             _context = context;
         }
 
-
-        public bool Atualizar(IList<PedidoItem> PedidoItens, ref Pedido Pedido)
+        public bool Atualizar(ref Pedido Pedido)
         {
             using (var transaction = _context.Database.BeginTransaction())
             {
@@ -31,10 +30,10 @@ namespace App.Repository.Repository
                     _context.Entry(Pedido).Reference(x => x.FormaPagamento).IsModified = false;
                     _context.Entry(Pedido).Collection(x => x.PedidoItem).IsModified = false;
 
-                    foreach (var PedidoItem in PedidoItens)
-                    {
-                        _context.PedidoItem.Update(PedidoItem).Property(c => c.CodigoPedidoItem).IsModified = false;
-                    }
+                    //foreach (var PedidoItem in PedidoItens)
+                    //{
+                    //    _context.PedidoItem.Update(PedidoItem).Property(c => c.CodigoPedidoItem).IsModified = false;
+                    //}
 
                     if (_context.SaveChanges() > 0)
                     {
@@ -66,14 +65,6 @@ namespace App.Repository.Repository
                 .Include(c => c.PedidoItem).FirstOrDefault();
         }
 
-        //public Pedido Buscar(int CodigoPedido)
-        //{
-        //    return _context.Pedido.Where(c => c.CodigoPedido.Equals(CodigoPedido))
-        //        .Include(c => c.FormaPagamento)
-        //        .Include(c => c.Usuario)
-        //        .Include(c => c.PedidoItem).FirstOrDefault();
-        //}
-
         public IList<Pedido> BuscarLista()
         {
             return _context.Pedido.ToList();
@@ -94,23 +85,21 @@ namespace App.Repository.Repository
             return _context.Pedido.Where(c => c.SituacaoPedido.Equals(StatusPedido)).ToList();
         }
 
-        public bool Salvar(IList<PedidoItem> PedidoItens, ref Pedido Pedido)
+        public bool Salvar(ref Pedido Pedido)
         {
             using (var transaction = _context.Database.BeginTransaction())
             {
                 try
                 {
                     _context.Pedido.Add(Pedido);
-                    //if (DescontoUtilizado != null)
-                    //    _context.DescontoUtilizado.Add(DescontoUtilizado);
-                    //_context.Entry(Pedido).State = EntityState.Added;
-                    //_context.Entry(Pedido).Reference(x => x.Usuario).IsModified = false;
-                    _context.Entry(Pedido).Reference(x => x.FormaPagamento).IsModified = false;
+                    //_context.Entry(Pedido).Reference(x => x.FormaPagamento).IsModified = false;
+                    //_context.Pedido.Add(Pedido).Reference(x => x.FormaPagamento).IsModified = false;
 
-                    foreach (var pedidoItem in PedidoItens)
-                    {
-                        _context.PedidoItem.Update(pedidoItem).Property(x => x.CodigoPedido).IsModified = false;
-                    }
+                    //foreach (var pedidoItem in Pedido.PedidoItem)
+                    //{
+                    //    //pedidoItem.Produtos = null;
+                    //    _context.Entry(pedidoItem).Reference(x => x.Produtos).IsModified = false;
+                    //}
 
                     if (_context.SaveChanges() > 0)
                     {

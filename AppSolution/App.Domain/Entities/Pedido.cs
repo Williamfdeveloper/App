@@ -17,6 +17,7 @@ namespace App.Domain.Entities
         public decimal ValorTotal { get; set; }
         public decimal ValorTotalComDesconto { get; set; }
         public int QuatidadeItensVenda { get; set; }
+        public DateTime DataCaptacaoPedido { get; set; }
         public DateTime DataPedido { get; set; }
         public DateTime DataAprovacaoPedido { get; set; }
         public int SituacaoPedido { get; set; }

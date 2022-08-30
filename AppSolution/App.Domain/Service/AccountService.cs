@@ -10,6 +10,7 @@ using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -171,8 +172,10 @@ namespace App.Domain.Service
             if (user == null)
                 throw new CustomException() { mensagemErro = "Usuário não encontrado" };
 
+            var claims = await GetRolesAsync(user);
+
             // Gera o Token
-            var token = _TokenService.GenerateToken(user);
+            var token = _TokenService.GenerateToken(user, claims);
 
             // Oculta a senha
             user.PasswordHash = "";
@@ -182,6 +185,20 @@ namespace App.Domain.Service
                 user = user,
                 token = token,
             };
+        }
+
+        public async Task<IEnumerable<Claim>> GetRolesAsync(Usuario user)
+        {
+            IList<Claim> claims = new List<Claim>();
+            claims.Add(new Claim(ClaimTypes.Name, user.UserName.ToString()));
+            var roles = _userManager.GetRolesAsync(user).Result.ToArray();
+            
+            foreach (var role in roles)
+            {
+                claims.Add(new Claim(ClaimTypes.Role, role));
+            }
+
+            return claims;
         }
     }
 }

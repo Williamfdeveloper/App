@@ -32,7 +32,7 @@ namespace App.Api.Controllers
         }
 
         [HttpGet("{id}")]
-        //[Route("GetProduto")]
+        [Route("GetProduto")]
         public ActionResult GetProduto(int id)
         {
             try
