@@ -31,6 +31,7 @@
     ".NETCoreApp,Version=v3.1": {
       "App.Api/1.0.0": {
         "dependencies": {
+          "App.Adapters": "1.0.0",
           "App.Repository": "1.0.0",
           "Microsoft.AspNetCore.Authentication.AzureAD.UI": "3.1.24",
           "Microsoft.AspNetCore.Mvc.NewtonsoftJson": "3.1.28",
@@ -1717,6 +1718,18 @@
           "System.Threading": "4.3.0",
           "System.Xml.ReaderWriter": "4.3.0",
           "System.Xml.XmlDocument": "4.3.0"
+        }
+      },
+      "App.Adapters/1.0.0": {
+        "dependencies": {
+          "App.Domain": "1.0.0",
+          "Newtonsoft.Json": "13.0.1"
+        },
+        "runtime": {
+          "App.Adapters.dll": {}
+        },
+        "compile": {
+          "App.Adapters.dll": {}
         }
       },
       "App.Domain/1.0.0": {
@@ -4321,6 +4334,11 @@
       "sha512": "sha512-MYoTCP7EZ98RrANESW05J5ZwskKDoN0AuZ06ZflnowE50LTpbR5yRg3tHckTVm5j/m47stuGgCrCHWePyHS70Q==",
       "path": "system.xml.xmlserializer/4.3.0",
       "hashPath": "system.xml.xmlserializer.4.3.0.nupkg.sha512"
+    },
+    "App.Adapters/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
     },
     "App.Domain/1.0.0": {
       "type": "project",

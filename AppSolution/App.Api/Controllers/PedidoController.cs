@@ -1,13 +1,10 @@
-﻿using App.Api.Model;
-using App.Domain;
-using App.Domain.Contracts;
+﻿using App.Domain.Contracts;
 using App.Domain.Entities;
+using App.Domain.Entities.TransacaoPedido;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
 using System;
 using System.Net;
 using System.Threading.Tasks;
@@ -38,17 +35,20 @@ namespace App.Api.Controllers
         }
 
 
-        [HttpPost]
-        [Route("CaptarPedido")]
+        [HttpGet]
+        [Route("GerarPedidoInicial")]
         [Authorize(Roles = "User")]
-        public ActionResult CaptarPedido([FromBody] Pedido pedido)
+        public async Task<ActionResult> GerarPedidoInicialAsync()
         {
             try
             {
-                var t = _pedidoService.CaptarPedido(ref pedido);
-                t.Wait();
+                var usuario = _userManager.FindByNameAsync(User.Identity.Name).Result;
+                if (usuario == null)
+                    throw new CustomException() { mensagemErro = "Usuario não identificado, por gentileza, efetue o Login." };
 
-                if (t.Result)
+                var pedido = _pedidoService.GerarPedidoInicial(usuario);
+
+                if (pedido != null && pedido.CodigoPedido > 0)
                     return Ok(pedido);
                 else
                     return BadRequest("Erro ao finalizar pedido!");
@@ -74,17 +74,158 @@ namespace App.Api.Controllers
         }
 
         [HttpPost]
-        [Route("VerificarSituacaoPedido")]
+        [Route("AdicionarItemPedido")]
         [Authorize(Roles = "User")]
-        public ActionResult VerificarSituacaoPedido([FromBody] int codigoPedido)
+        public async Task<ActionResult> AdicionarItemPedidoAsync([FromBody] ItemCarrinho ItemCarrinho)
         {
             try
             {
-                var t = _pedidoService.ConsultarPedido(codigoPedido);
-                t.Wait();
+                var usuario = _userManager.FindByNameAsync(User.Identity.Name).Result;
+                if (usuario == null)
+                    throw new CustomException() { mensagemErro = "Usuario não identificado, por gentileza, efetue o Login." };
 
-                var pedido = t.Result;
+                if (_pedidoService.AdicionarItemPedido(usuario, ref ItemCarrinho))
+                    return Ok(ItemCarrinho.pedido);
+                else
+                    return BadRequest("Erro ao finalizar pedido!");
 
+            }
+            catch (AggregateException cex) when (cex.InnerException is CustomException)
+            {
+                _logger.LogError(cex.ToString());
+
+                return BadRequest(_loggerService.InsertLog(cex).mensagemErro);
+            }
+            catch (Exception ex)
+            {
+                string erro = $"Message:{ex.Message} - StackTrace: {ex.StackTrace}";
+                _logger.LogError(erro);
+                _loggerService.InsertLog(ex);
+
+                var retorno = Content(erro);
+                retorno.StatusCode = (int)HttpStatusCode.InternalServerError;
+
+                return retorno;
+            }
+        }
+
+        [HttpPost]
+        [Route("AdicionarFormaPagamentoPedido")]
+        [Authorize(Roles = "User")]
+        public async Task<ActionResult> AdicionarFormaPagamentoPedidoAsync([FromBody] FomaPagamentoModel FomaPagamentoModel)
+        {
+            try
+            {
+                var usuario = _userManager.FindByNameAsync(User.Identity.Name).Result;
+                if (usuario == null)
+                    throw new CustomException() { mensagemErro = "Usuario não identificado, por gentileza, efetue o Login." };
+
+                if (_pedidoService.AdicionarFormaPagamentoPedido(usuario, ref FomaPagamentoModel))
+                    return Ok(FomaPagamentoModel.pedido);
+                else
+                    return BadRequest("Erro ao adicionar forma de pagamento ao pedido!");
+
+            }
+            catch (AggregateException cex) when (cex.InnerException is CustomException)
+            {
+                _logger.LogError(cex.ToString());
+
+                return BadRequest(_loggerService.InsertLog(cex).mensagemErro);
+            }
+            catch (Exception ex)
+            {
+                string erro = $"Message:{ex.Message} - StackTrace: {ex.StackTrace}";
+                _logger.LogError(erro);
+                _loggerService.InsertLog(ex);
+
+                var retorno = Content(erro);
+                retorno.StatusCode = (int)HttpStatusCode.InternalServerError;
+
+                return retorno;
+            }
+        }
+
+        [HttpPost]
+        [Route("FinalizarPedido")]
+        [Authorize(Roles = "User")]
+        public async Task<ActionResult> FinalizarPedidoarPedidoAsync([FromBody] FinalizarPedidoModel FinalizarPedidoModel)
+        {
+            try
+            {
+                var usuario = _userManager.FindByNameAsync(User.Identity.Name).Result;
+                if (usuario == null)
+                    throw new CustomException() { mensagemErro = "Usuario não identificado, por gentileza, efetue o Login." };
+
+                if (_pedidoService.FinalizarPedido(usuario, FinalizarPedidoModel.Cartao, FinalizarPedidoModel.pedido))
+                    return Ok("Pedido Finalizado com sucesso");
+                else
+                    return BadRequest("Erro ao finalizar pedido!");
+
+            }
+            catch (AggregateException cex) when (cex.InnerException is CustomException)
+            {
+                _logger.LogError(cex.ToString());
+
+                return BadRequest(_loggerService.InsertLog(cex).mensagemErro);
+            }
+            catch (Exception ex)
+            {
+                string erro = $"Message:{ex.Message} - StackTrace: {ex.StackTrace}";
+                _logger.LogError(erro);
+                _loggerService.InsertLog(ex);
+
+                var retorno = Content(erro);
+                retorno.StatusCode = (int)HttpStatusCode.InternalServerError;
+
+                return retorno;
+            }
+        }
+
+        [HttpPost]
+        [Route("AdicionarAFilaPedido")]
+        [Authorize(Roles = "User")]
+        public async Task<ActionResult> AdicionarAFilaPedidoAsync([FromBody] FinalizarPedidoModel FinalizarPedidoModel)
+        {
+            try
+            {
+                var usuario = _userManager.FindByNameAsync(User.Identity.Name).Result;
+                if (usuario == null)
+                    throw new CustomException() { mensagemErro = "Usuario não identificado, por gentileza, efetue o Login." };
+                
+                if (_pedidoService.AdicionaPedidoFila(usuario, FinalizarPedidoModel))
+                    return Ok("Pedido adicionado a fila de processamento");
+                else
+                    return BadRequest("Erro ao finalizar pedido!");
+            }
+            catch (AggregateException cex) when (cex.InnerException is CustomException)
+            {
+                _logger.LogError(cex.ToString());
+
+                return BadRequest(_loggerService.InsertLog(cex).mensagemErro);
+            }
+            catch (Exception ex)
+            {
+                string erro = $"Message:{ex.Message} - StackTrace: {ex.StackTrace}";
+                _logger.LogError(erro);
+                _loggerService.InsertLog(ex);
+
+                var retorno = Content(erro);
+                retorno.StatusCode = (int)HttpStatusCode.InternalServerError;
+
+                return retorno;
+            }
+        }
+
+
+
+        [HttpGet]
+        [Route("SolicitarPedidoAtualizado")]
+        [Authorize(Roles = "User")]
+        public async Task<ActionResult> SolicitarPedidoAtualizadoAsync([FromQuery] int codigoPedido)
+        {
+            try
+            {
+                var pedido = _pedidoService.ConsultarPedido(codigoPedido);
                 if (pedido != null)
                     return Ok(pedido);
                 else

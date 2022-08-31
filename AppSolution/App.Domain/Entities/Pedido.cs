@@ -1,6 +1,4 @@
-﻿
-using Microsoft.AspNetCore.Identity;
-using System;
+﻿using System;
 using System.Collections.Generic;
 
 namespace App.Domain.Entities
@@ -19,6 +17,7 @@ namespace App.Domain.Entities
         public int QuatidadeItensVenda { get; set; }
         public DateTime DataCaptacaoPedido { get; set; }
         public DateTime DataPedido { get; set; }
+        public DateTime DataAtualizacaoPedido { get; set; }
         public DateTime DataAprovacaoPedido { get; set; }
         public int SituacaoPedido { get; set; }
         public string CupomDesconto { get; set; }

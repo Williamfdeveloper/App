@@ -1958,6 +1958,20 @@
           "lib/netstandard1.3/System.Xml.XmlSerializer.dll": {}
         }
       },
+      "App.Adapters/1.0.0": {
+        "type": "project",
+        "framework": ".NETCoreApp,Version=v3.1",
+        "dependencies": {
+          "App.Domain": "1.0.0",
+          "Newtonsoft.Json": "13.0.1"
+        },
+        "compile": {
+          "bin/placeholder/App.Adapters.dll": {}
+        },
+        "runtime": {
+          "bin/placeholder/App.Adapters.dll": {}
+        }
+      },
       "App.Domain/1.0.0": {
         "type": "project",
         "framework": ".NETCoreApp,Version=v3.1",
@@ -6875,6 +6889,11 @@
         "system.xml.xmlserializer.nuspec"
       ]
     },
+    "App.Adapters/1.0.0": {
+      "type": "project",
+      "path": "../App.Adapters/App.Adapters.csproj",
+      "msbuildProject": "../App.Adapters/App.Adapters.csproj"
+    },
     "App.Domain/1.0.0": {
       "type": "project",
       "path": "../App.Domain/App.Domain.csproj",
@@ -6888,6 +6907,7 @@
   },
   "projectFileDependencyGroups": {
     ".NETCoreApp,Version=v3.1": [
+      "App.Adapters >= 1.0.0",
       "App.Repository >= 1.0.0",
       "Microsoft.AspNetCore.Authentication.AzureAD.UI >= 3.1.24",
       "Microsoft.AspNetCore.Mvc.NewtonsoftJson >= 3.1.28",
@@ -6928,6 +6948,9 @@
         "netcoreapp3.1": {
           "targetAlias": "netcoreapp3.1",
           "projectReferences": {
+            "C:\\git\\App\\AppSolution\\App.Adapters\\App.Adapters.csproj": {
+              "projectPath": "C:\\git\\App\\AppSolution\\App.Adapters\\App.Adapters.csproj"
+            },
             "C:\\git\\App\\AppSolution\\App.Repository\\App.Repository.csproj": {
               "projectPath": "C:\\git\\App\\AppSolution\\App.Repository\\App.Repository.csproj"
             }

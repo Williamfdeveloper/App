@@ -97,7 +97,7 @@ namespace App.Repository.Migrations
                     b.HasData(
                         new
                         {
-                            ID = new Guid("8c7d5376-a90d-410d-8c6c-38acbfe64b06"),
+                            ID = new Guid("c87d8cff-2adb-424a-a1bf-6e08812af526"),
                             PrimaryDomain = "mail.v2wstore.com.br",
                             PrimaryPort = 465,
                             ServerNameDisplay = "V2WMedia",
@@ -286,7 +286,7 @@ namespace App.Repository.Migrations
                     b.HasData(
                         new
                         {
-                            parametrosid = new Guid("e1f5f1be-39c0-469c-b516-ba7a53f8c4ac"),
+                            parametrosid = new Guid("69bd532c-e906-4191-8d49-632d5b08ca14"),
                             descricao = "Template para enviar email de reset de senha",
                             nome = "HtmlTemplateEmailDefault",
                             tipocampo = 1,
@@ -294,7 +294,7 @@ namespace App.Repository.Migrations
                         },
                         new
                         {
-                            parametrosid = new Guid("eff0846d-38c6-4c7e-9cee-001ec6c7c39a"),
+                            parametrosid = new Guid("d101d5ca-b0ba-4d35-a40e-40d5844721b5"),
                             descricao = "Email para contato",
                             nome = "EmailContato",
                             tipocampo = 1,
@@ -302,7 +302,7 @@ namespace App.Repository.Migrations
                         },
                         new
                         {
-                            parametrosid = new Guid("154051e1-9bfe-4908-8ff5-1022d203d57d"),
+                            parametrosid = new Guid("4c7cf579-c33d-47dc-b2aa-6f8a103d596b"),
                             descricao = "logo para email",
                             nome = "LogoEmail",
                             tipocampo = 1,
@@ -310,7 +310,7 @@ namespace App.Repository.Migrations
                         },
                         new
                         {
-                            parametrosid = new Guid("fb26f4ae-23db-4a40-87a0-522165f836d1"),
+                            parametrosid = new Guid("95f1d58f-f267-42a7-b997-66b019d97736"),
                             descricao = "Parametro para validar se deve ser enviado Email de reset de senha",
                             nome = "ParametroEnviarEmailResetSenha",
                             tipocampo = 1,
@@ -318,7 +318,7 @@ namespace App.Repository.Migrations
                         },
                         new
                         {
-                            parametrosid = new Guid("bf5d3ca0-e8b1-42b3-9aa1-1b99d2d697c8"),
+                            parametrosid = new Guid("e5e29377-bf2b-42b3-b582-afdaa23d57c2"),
                             descricao = "Parametro para validar se deve ser enviado Email de Confirmação de email",
                             nome = "ParametroEnviarConfirmacaoEmail",
                             tipocampo = 1,
@@ -326,7 +326,7 @@ namespace App.Repository.Migrations
                         },
                         new
                         {
-                            parametrosid = new Guid("46e0db3e-6d2c-4d70-ab27-bfaa9652ba04"),
+                            parametrosid = new Guid("f4ac62b7-1f10-4825-9c21-b547ed9d8f11"),
                             descricao = "Parametro para validar como será salvo as imagens 1 - Banco | 2 Arquivo",
                             nome = "ParametroTipoImagem",
                             tipocampo = 1,
@@ -334,7 +334,7 @@ namespace App.Repository.Migrations
                         },
                         new
                         {
-                            parametrosid = new Guid("9f69711b-86a5-4a7a-bcfd-aa722022f43f"),
+                            parametrosid = new Guid("777b458b-95f0-4190-a247-9781bb5ca88d"),
                             descricao = "Parametro utilizado para identificar qual a pasta que será salvo as imagens.",
                             nome = "ParametroCaminhoPastaArquivo",
                             tipocampo = 1,
@@ -412,8 +412,12 @@ namespace App.Repository.Migrations
             modelBuilder.Entity("App.Domain.Entities.PedidoHistorico", b =>
                 {
                     b.Property<int>("CodigoPedido")
-                        .ValueGeneratedOnAdd()
                         .HasColumnName("CD_PEDIDO")
+                        .HasColumnType("int");
+
+                    b.Property<int>("CodigoPedidoHistorico")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnName("CD_PEDIDO_HISTORICO")
                         .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
@@ -433,12 +437,7 @@ namespace App.Repository.Migrations
                         .HasColumnName("ID_SITUACAO")
                         .HasColumnType("int");
 
-                    b.Property<int?>("PedidoCodigoPedido")
-                        .HasColumnType("int");
-
-                    b.HasKey("CodigoPedido");
-
-                    b.HasIndex("PedidoCodigoPedido");
+                    b.HasKey("CodigoPedido", "CodigoPedidoHistorico");
 
                     b.ToTable("TB_PEDIDO_HISTORICO","dbo");
                 });
@@ -515,7 +514,15 @@ namespace App.Repository.Migrations
                         .HasColumnName("ID_SITUACAO_PAGAMENTO")
                         .HasColumnType("int");
 
+                    b.Property<int?>("PedidoPagamentoHistoricoCodigoPedidoPagamento")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("PedidoPagamentoHistoricoCodigoPedidoPagamentoHistorico")
+                        .HasColumnType("int");
+
                     b.HasKey("CodigoPedidoPagamento");
+
+                    b.HasIndex("PedidoPagamentoHistoricoCodigoPedidoPagamentoHistorico", "PedidoPagamentoHistoricoCodigoPedidoPagamento");
 
                     b.ToTable("TB_PEDIDO_PAGAMENTO","dbo");
                 });
@@ -540,7 +547,7 @@ namespace App.Repository.Migrations
                         .HasColumnName("ID_SITUACAO_PAGAMENTO")
                         .HasColumnType("int");
 
-                    b.HasKey("CodigoPedidoPagamentoHistorico");
+                    b.HasKey("CodigoPedidoPagamentoHistorico", "CodigoPedidoPagamento");
 
                     b.ToTable("TB_PEDIDO_PAGAMENTO_HISTORICO","dbo");
                 });
@@ -563,16 +570,11 @@ namespace App.Repository.Migrations
                         .HasColumnName("DC_LINK")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int?>("PedidoItemCodigoPedidoItem")
-                        .HasColumnType("int");
-
                     b.Property<decimal>("Valor")
                         .HasColumnName("MO_VALOR")
                         .HasColumnType("decimal(18,2)");
 
                     b.HasKey("CodigoProduto");
-
-                    b.HasIndex("PedidoItemCodigoPedidoItem");
 
                     b.ToTable("TB_PRODUTO","dbo");
 
@@ -895,9 +897,11 @@ namespace App.Repository.Migrations
 
             modelBuilder.Entity("App.Domain.Entities.PedidoHistorico", b =>
                 {
-                    b.HasOne("App.Domain.Entities.Pedido", null)
+                    b.HasOne("App.Domain.Entities.Pedido", "Pedido")
                         .WithMany("PedidoHistorico")
-                        .HasForeignKey("PedidoCodigoPedido");
+                        .HasForeignKey("CodigoPedido")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("App.Domain.Entities.PedidoItem", b =>
@@ -907,11 +911,11 @@ namespace App.Repository.Migrations
                         .HasForeignKey("PedidoCodigoPedido");
                 });
 
-            modelBuilder.Entity("App.Domain.Entities.Produto", b =>
+            modelBuilder.Entity("App.Domain.Entities.PedidoPagamento", b =>
                 {
-                    b.HasOne("App.Domain.Entities.PedidoItem", null)
-                        .WithMany("Produtos")
-                        .HasForeignKey("PedidoItemCodigoPedidoItem");
+                    b.HasOne("App.Domain.Entities.PedidoPagamentoHistorico", "PedidoPagamentoHistorico")
+                        .WithMany()
+                        .HasForeignKey("PedidoPagamentoHistoricoCodigoPedidoPagamentoHistorico", "PedidoPagamentoHistoricoCodigoPedidoPagamento");
                 });
 
             modelBuilder.Entity("App.Domain.Entities.Usuario", b =>

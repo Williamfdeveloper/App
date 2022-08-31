@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.2.32526.322
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "1 - User Interfaces", "1 - User Interfaces", "{6A6516A1-DC80-41B6-A879-BE7274CE9BDF}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "1 - User Api", "1 - User Api", "{6A6516A1-DC80-41B6-A879-BE7274CE9BDF}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "2 - Application Core", "2 - Application Core", "{75370829-5BBD-4B21-BA62-A0AD9C3701F6}"
 EndProject
@@ -11,19 +11,19 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "3 - Infrastructure", "3 - I
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "4 - Test", "4 - Test", "{6E35F8B6-E04E-4326-B116-721CBC807970}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "App.Api", "App.Api\App.Api.csproj", "{48EF006B-E3A2-4902-9A08-B5F153730958}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "App.Api", "App.Api\App.Api.csproj", "{48EF006B-E3A2-4902-9A08-B5F153730958}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "App.Domain", "App.Domain\App.Domain.csproj", "{6B22175B-C7DD-4AED-9916-3D3497E89644}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "App.Domain", "App.Domain\App.Domain.csproj", "{6B22175B-C7DD-4AED-9916-3D3497E89644}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "3.1 - Adapters", "3.1 - Adapters", "{E21A68BA-252F-4972-86A4-5B80F7C3AD75}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "3.2 - Repository", "3.2 - Repository", "{8DF2DECF-CCFB-4950-A4EC-2113DE8B089D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "App.Adapters", "App.Adapters\App.Adapters.csproj", "{01F566FB-308A-457E-88D3-45D39DBE9120}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "App.Adapters", "App.Adapters\App.Adapters.csproj", "{01F566FB-308A-457E-88D3-45D39DBE9120}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "App.Repository", "App.Repository\App.Repository.csproj", "{CA593C71-2339-4D99-94F9-5B98A33FE082}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "App.Repository", "App.Repository\App.Repository.csproj", "{CA593C71-2339-4D99-94F9-5B98A33FE082}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "App.Test", "App.Test\App.Test.csproj", "{01EE9FE7-ABC5-4599-9F0E-246D763491E0}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "App.Test", "App.Test\App.Test.csproj", "{01EE9FE7-ABC5-4599-9F0E-246D763491E0}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

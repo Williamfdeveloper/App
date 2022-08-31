@@ -15,7 +15,7 @@ namespace App.Repository.Configuration
             builder.ToTable("TB_PEDIDO_PAGAMENTO_HISTORICO", "dbo");
 
             // Primary Key
-            builder.HasKey(m => new { m.CodigoPedidoPagamentoHistorico });
+            builder.HasKey(m => new { m.CodigoPedidoPagamentoHistorico, m.CodigoPedidoPagamento });
 
             // Properties / Column Mapping
             builder.Property(e => e.CodigoPedidoPagamentoHistorico).HasColumnName("CD_PEDIDO_PAGAMENTO_HISTORICO").IsRequired().ValueGeneratedOnAdd();

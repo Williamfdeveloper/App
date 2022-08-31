@@ -8,7 +8,7 @@ namespace App.Domain.Contracts
 {
     public interface IMessageQueueService
     {
-        Task<bool> PostMessageQueue<T>(T Object, int fila);
-        Task<bool> ProcessMessageQueue<T>(int fila);
+        bool PostMessageQueue<T>(T Object, int fila);
+        //bool ProcessMessageQueue(int fila);
     }
 }

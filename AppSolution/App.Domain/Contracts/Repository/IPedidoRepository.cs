@@ -8,7 +8,7 @@ namespace App.Domain.Contracts.Repository
     public interface IPedidoRepository
     {
         bool Salvar(ref Pedido Pedido);
-        bool Atualizar(ref Pedido Pedido);
+        bool Atualizar(Pedido Pedido);
         Pedido Buscar(int CodigoPedido);
         IList<Pedido> BuscarLista();
         IList<Pedido> BuscarListaPorUsuario(string UsuarioID);

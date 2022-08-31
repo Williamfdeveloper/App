@@ -65,8 +65,6 @@ namespace App.Api.Controllers
         }
 
 
-
-
         [HttpPost]
         [AllowAnonymous]
         [Route("login")]
@@ -77,11 +75,9 @@ namespace App.Api.Controllers
                 if (!ModelState.IsValid)
                     return View();
 
-                var t = _accountService.AuthenticateAsync(model);
+                var t = await _accountService.AuthenticateAsync(model);
 
-                t.Wait();
-
-                return Ok(t.Result);
+                return Ok(t);
             }
             catch (AggregateException cex) when (cex.InnerException is CustomException)
             {
@@ -110,7 +106,7 @@ namespace App.Api.Controllers
         [HttpPost]
         [AllowAnonymous]
         [Route("register")]
-        public ActionResult Register([FromBody] Register model)
+        public async Task<ActionResult> RegisterAsync([FromBody] Register model)
         {
             try
             {
@@ -125,10 +121,9 @@ namespace App.Api.Controllers
                 }
 
 
-                var t = _accountService.CadastrarAsync(model);
-                t.Wait();
+                var t = await _accountService.CadastrarAsync(model);
 
-                return Ok(t.Result);
+                return Ok(t);
 
             }
             catch (AggregateException cex) when (cex.InnerException is CustomException)
@@ -175,7 +170,7 @@ namespace App.Api.Controllers
         [HttpPost]
         [Route("adicionarCartao")]
         [Authorize(Roles = "User")]
-        public ActionResult AdicionarCartao([FromBody] CartaoModel cartao)
+        public async Task<ActionResult> AdicionarCartaoAsync([FromBody] CartaoModel cartao)
         {
             try
             {
@@ -183,11 +178,51 @@ namespace App.Api.Controllers
                 if (usuario == null)
                     throw new CustomException() { mensagemErro = "Usuario não identificado, por gentileza, efetue o Login." };
 
-                var t = _dadosCartaoService.AdicionarCartao(cartao, usuario);
-                t.Wait();
+                var t = await _dadosCartaoService.AdicionarCartao(cartao, usuario);
 
-                if (t.Result)
+                if (t)
                     return Ok("Cartão adicionado com sucesso!");
+                else
+                    return BadRequest("Falha ao adicionar cartão");
+            }
+            catch (AggregateException cex) when (cex.InnerException is CustomException)
+            {
+                _logger.LogError(cex.ToString());
+                //var retorno = Content(_loggerService.InsertLog(cex).mensagemErro);
+                //retorno.StatusCode = (int)HttpStatusCode.InternalServerError;
+
+                //return retorno;
+                return BadRequest(_loggerService.InsertLog(cex).mensagemErro);
+            }
+            catch (Exception ex)
+            {
+                string erro = $"Message:{ex.Message} - StackTrace: {ex.StackTrace}";
+                //var MessageError = "Erro nao catalogado, por favor verifique log da aplicação.";
+                _logger.LogError(erro);
+                _loggerService.InsertLog(ex);
+
+                var retorno = Content(erro);
+                retorno.StatusCode = (int)HttpStatusCode.InternalServerError;
+
+                return retorno;
+            }
+        }
+
+        [HttpGet]
+        [Route("BuscarCartaoPagamento")]
+        [Authorize(Roles = "User")]
+        public async Task<ActionResult> BuscarCartaoPagamentoAsync()
+        {
+            try
+            {
+                var usuario = _userManager.FindByNameAsync(User.Identity.Name).Result;
+                if (usuario == null)
+                    throw new CustomException() { mensagemErro = "Usuario não identificado, por gentileza, efetue o Login." };
+
+                var t = await _dadosCartaoService.BuscarListaCartoes(usuario.Id);
+
+                if (t != null)
+                    return Ok(t);
                 else
                     return BadRequest("Falha ao adicionar cartão");
             }

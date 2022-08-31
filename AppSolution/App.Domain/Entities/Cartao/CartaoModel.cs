@@ -9,6 +9,6 @@ namespace App.Domain.Entities.Cartao
         public string NumeroCartao { get; set; }
         public string NomeCartao { get; set; }
         public string DataVencimentoCartao { get; set; }
-        public int SenhaCartao { get; set; }
+        public string SenhaCartao { get; set; }
     }
 }

@@ -1,5 +1,7 @@
+using App.Adapters;
 using App.Domain;
 using App.Domain.Contracts;
+using App.Domain.Contracts.Adapter;
 using App.Domain.Contracts.Repository;
 using App.Domain.Entities;
 using App.Domain.Service;
@@ -46,6 +48,8 @@ namespace App.Api
             services.AddControllers();
 
 
+
+
             services.AddDbContext<DefaultContext>(options => options.UseSqlServer(Configuration.GetConnectionString("SqlServerConnection")));
             services.AddIdentity<Usuario, IdentityRole>().AddEntityFrameworkStores<DefaultContext>();
 
@@ -61,10 +65,14 @@ namespace App.Api
             services.AddTransient<IEmailSistemaService, EmailSistemaService>();
             services.AddTransient<IParametrosService, ParametrosService>();
             services.AddTransient<IPedidoService, PedidoService>();
+            services.AddTransient<IPagamentoService, PagamentoService>();
+            //services.AddTransient<IProcessTaskService, ProcessTaskService>();
+
             services.AddTransient<IMessageQueueService, MessageQueueService>();
+            services.AddSingleton<IHostedService, DataRefreshService>();
 
             //Adapter
-            //services.AddSingleton<IUsuarioAdapter, UsuarioAdapter>();
+            services.AddTransient<IPagamentoAdapter, PagamentoAdapter>();
 
             //Repository
             services.AddTransient<IDadosCartaoRepository, DadosCartaoRepository>();
@@ -75,7 +83,7 @@ namespace App.Api
             services.AddTransient<IPedidoRepository, PedidoRepository>();
             services.AddTransient<IFormasPagamentoRepository, FormasPagamentoRepository>();
 
-            services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+            //services.AddTransient<IHttpContextAccessor, HttpContextAccessor>();
             #endregion
 
             services.AddSwaggerGen(c =>
@@ -120,6 +128,7 @@ namespace App.Api
             {
                 o.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
             });
+
 
         }
 

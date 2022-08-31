@@ -31,7 +31,7 @@ namespace App.Domain.Service
             if (Convert.ToDateTime(cartao.DataVencimentoCartao) <= DateTime.Now.Date)
                 throw new CustomException() { mensagemErro = "Vencimento do cartão esta ultrapassado."};
 
-            if (cartao.SenhaCartao < 0 && cartao.SenhaCartao > 999)
+            if (cartao.SenhaCartao.Length < 3 || Convert.ToInt32(cartao.SenhaCartao) > 999)
                 throw new CustomException() { mensagemErro = "Senha do cartão inválida" };
 
             if (string.IsNullOrEmpty(cartao.NomeCartao))
@@ -58,6 +58,10 @@ namespace App.Domain.Service
 
         public async Task<IList<DadosCartao>> BuscarListaCartoes(string codigoUsuario)
         {
+            if (string.IsNullOrEmpty(codigoUsuario))
+                throw new CustomException() { mensagemErro = "Codigo do usuario inválido" };
+
+
             return _cartaoRepository.BuscarLista(codigoUsuario);
         }
 

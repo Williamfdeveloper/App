@@ -18,6 +18,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\App.Adapters\App.Adapters.csproj" />
     <ProjectReference Include="..\App.Repository\App.Repository.csproj" />
   </ItemGroup>
 

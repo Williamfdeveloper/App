@@ -82,3 +82,5 @@ C:\git\App\AppSolution\App.Api\bin\Debug\netcoreapp3.1\Microsoft.AspNetCore.Mvc.
 C:\git\App\AppSolution\App.Api\bin\Debug\netcoreapp3.1\Newtonsoft.Json.Bson.dll
 C:\git\App\AppSolution\App.Api\bin\Debug\netcoreapp3.1\RabbitMQ.Client.dll
 C:\git\App\AppSolution\App.Api\bin\Debug\netcoreapp3.1\System.Threading.Channels.dll
+C:\git\App\AppSolution\App.Api\bin\Debug\netcoreapp3.1\App.Adapters.dll
+C:\git\App\AppSolution\App.Api\bin\Debug\netcoreapp3.1\App.Adapters.pdb

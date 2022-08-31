@@ -15,10 +15,11 @@ namespace App.Repository.Configuration
             builder.ToTable("TB_PEDIDO_HISTORICO", "dbo");
 
             // Primary Key
-            builder.HasKey(m => new { m.CodigoPedido });
+            builder.HasKey(m => new { m.CodigoPedido, m.CodigoPedidoHistorico });
 
             // Properties / Column Mapping
-            builder.Property(e => e.CodigoPedido).HasColumnName("CD_PEDIDO").IsRequired().ValueGeneratedOnAdd();
+            builder.Property(e => e.CodigoPedidoHistorico).HasColumnName("CD_PEDIDO_HISTORICO").IsRequired().ValueGeneratedOnAdd();
+            builder.Property(e => e.CodigoPedido).HasColumnName("CD_PEDIDO").IsRequired();
             builder.Property(e => e.IdSituacaoPedido).HasColumnName("ID_SITUACAO").IsRequired();
             builder.Property(e => e.DataSituacao).HasColumnName("DH_SITUACAO").IsRequired();
             builder.Property(e => e.DataAtualizacaoInicio).HasColumnName("DH_SITUACAO_INICIO").IsRequired();
@@ -26,7 +27,7 @@ namespace App.Repository.Configuration
 
             // relationsShips
             //this.HasRequired(m => m.Cidades);
-            //this.HasMany(x => x.Cidades).WithRequired(x => x.Estado).HasForeignKey(x => x.Estado);
+            //builder.HasOne(x => x.Pedido).WithMany(x => x.PedidoHistorico).HasForeignKey(x => x.CodigoPedido);
         }
     }
 }

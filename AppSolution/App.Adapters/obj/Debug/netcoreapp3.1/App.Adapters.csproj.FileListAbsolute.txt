@@ -11,3 +11,6 @@ C:\git\App\AppSolution\App.Adapters\obj\Debug\netcoreapp3.1\App.Adapters.pdb
 C:\git\App\AppSolution\App.Adapters\bin\Debug\netcoreapp3.1\App.Adapters.runtimeconfig.json
 C:\git\App\AppSolution\App.Adapters\bin\Debug\netcoreapp3.1\App.Adapters.runtimeconfig.dev.json
 C:\git\App\AppSolution\App.Adapters\obj\Debug\netcoreapp3.1\App.Adapters.genruntimeconfig.cache
+C:\git\App\AppSolution\App.Adapters\bin\Debug\netcoreapp3.1\App.Domain.dll
+C:\git\App\AppSolution\App.Adapters\bin\Debug\netcoreapp3.1\App.Domain.pdb
+C:\git\App\AppSolution\App.Adapters\obj\Debug\netcoreapp3.1\App.Adapters.csproj.CopyComplete

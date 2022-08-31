@@ -27,6 +27,7 @@ namespace App.Repository.Configuration
 
 
             // relationsShips
+            builder.HasMany(x => x.PedidoPagamentoHistorico).WithOne(x => x.PedidoPagamento).HasForeignKey(x => x.CodigoPedidoPagamento);
             //this.HasRequired(m => m.Cidades);
             //this.HasMany(x => x.Cidades).WithRequired(x => x.Estado).HasForeignKey(x => x.Estado);
         }
