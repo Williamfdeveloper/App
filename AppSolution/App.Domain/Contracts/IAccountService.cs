@@ -11,5 +11,8 @@ namespace App.Domain.Contracts
     {
         Task<LoginResponse> AuthenticateAsync(Login model);
         Task<RegisterResponse> CadastrarAsync(Register model);
+
+        
+
     }
 }

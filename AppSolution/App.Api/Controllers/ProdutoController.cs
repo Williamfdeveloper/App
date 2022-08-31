@@ -33,11 +33,11 @@ namespace App.Api.Controllers
 
         [HttpGet("{id}")]
         [Route("GetProduto")]
-        public ActionResult GetProduto(int id)
+        public ActionResult GetProduto(int codigoProduto)
         {
             try
             {
-                return Ok(_produtoService.BuscarProduto(id));
+                return Ok(_produtoService.BuscarProduto(codigoProduto));
             }
             catch (System.Exception ex)
             {

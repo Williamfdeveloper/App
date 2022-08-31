@@ -56,7 +56,7 @@ namespace App.Api
 
             #region IoC
             //Domain
-            services.AddTransient<IAccountService, AccountService>();
+            //services.AddTransient<IAccountService, AccountService>();
             services.AddTransient<IProdutoService, ProdutoService>();
             services.AddTransient<IDadosCartaoService, DadosCartaoService>();
             services.AddTransient<ITokenService, TokenService>();
@@ -69,7 +69,8 @@ namespace App.Api
             //services.AddTransient<IProcessTaskService, ProcessTaskService>();
 
             services.AddTransient<IMessageQueueService, MessageQueueService>();
-            services.AddSingleton<IHostedService, DataRefreshService>();
+            services.AddTransient<IHostedService, SchedulerService>();
+            
 
             //Adapter
             services.AddTransient<IPagamentoAdapter, PagamentoAdapter>();

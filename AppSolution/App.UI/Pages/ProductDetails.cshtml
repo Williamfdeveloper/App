@@ -1,0 +1,19 @@
+﻿@page
+@model App.UI.Pages.ProductDetailsModel
+@{
+}
+
+
+
+<form id="profile-form" method="post" enctype="multipart/form-data">
+    <p><input asp-for="Produto.CodigoProduto" class="form-control" disabled /></p>
+    <p><input asp-for="Produto.Descricao" class="form-control" disabled /></p>
+    <p><input asp-for="Produto.Valor" class="form-control" disabled /></p>
+    <p><input asp-for="Produto.LinkDownload" class="form-control" disabled /></p>
+
+    <button id="update-profile-button" type="submit" class="btn btn-danger btn-sm text-center"><i class="fa fa-save"></i>Adicionar ao carrinho</button>
+
+</form>
+
+
+@*@Html.ActionLink("Details", "ProductDetails", new {  produ.CodigoProduto  });*@

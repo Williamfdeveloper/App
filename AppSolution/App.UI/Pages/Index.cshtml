@@ -1,0 +1,58 @@
+﻿@page
+@model IndexModel
+@{
+    ViewData["Title"] = "Home page";
+}
+
+<div class="text-center">
+    <h1 class="display-4">Welcome</h1>
+    <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+</div>
+
+
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                CodigoProduto
+            </th>
+            <th>
+                Descricao
+            </th>
+            <th>
+                Valor
+            </th>
+            <th>
+                LinkDownload
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model.Produtos) {
+                <tr>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.CodigoProduto)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Descricao)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Valor)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.LinkDownload)
+                    </td>
+                    <td>
+                        @*@Html.ActionLink("Edit", "Edit", new { /* id=item.PrimaryKey */ }) |*@
+
+                        <a href="@Url.Page("/ProductDetails",pageHandler: null,values: new { area = "", Codigo = item.CodigoProduto },protocol: Request.Scheme)">Ver detalhes</a>
+
+                        @*@Html.ActionLink("Ver detalhes", "ProductDetails", new {  Codigo=item.CodigoProduto  }) *@
+                        @*@Html.ActionLink("Delete", "Delete", new { /* id=item.PrimaryKey */ })*@
+                    </td>
+                </tr>
+        }
+    </tbody>
+</table>

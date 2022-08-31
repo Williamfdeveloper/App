@@ -9,15 +9,15 @@ namespace App.Domain.Service
     public class MessageQueueService : IMessageQueueService
     {
         //private readonly IPedidoService _pedidoService;
-        private readonly ILoggerService _loggerService;
+        //private readonly ILoggerService _loggerService;
 
-        public MessageQueueService(
-            //IPedidoService pedidoService, 
-            ILoggerService loggerService)
-        {
-            _loggerService = loggerService;
-            //_pedidoService = pedidoService;
-        }
+        //public MessageQueueService(
+        //    //IPedidoService pedidoService, 
+        //    ILoggerService loggerService)
+        //{
+        //    _loggerService = loggerService;
+        //    //_pedidoService = pedidoService;
+        //}
 
         public bool PostMessageQueue<T>(T Object, int fila)
         {

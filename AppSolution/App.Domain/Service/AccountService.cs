@@ -22,6 +22,7 @@ namespace App.Domain.Service
         private readonly ILogger<AccountService> _logger;
         private readonly ITokenService _TokenService;
         private readonly IEmailSistemaService _emailService;
+        private readonly IAccountService _accountService;
         private readonly RoleManager<IdentityRole> _roleManager;
         private readonly SignInManager<Usuario> _signInManager;
         private readonly IHttpContextAccessor _httpContextAccessor;
@@ -35,8 +36,10 @@ namespace App.Domain.Service
             ITokenService ITokenService,
             IEmailSistemaService emailService,
             SignInManager<Usuario> signInManager,
-            IHttpContextAccessor httpContextAccessor)
+            IHttpContextAccessor httpContextAccessor,
+            IAccountService accountService)
         {
+            _accountService = accountService;
             _httpContextAccessor = httpContextAccessor;
             _signInManager = signInManager;
             _roleManager = RoleManager;
@@ -200,5 +203,43 @@ namespace App.Domain.Service
 
             return claims;
         }
+
+        //public LoginResponse AuthenticateApi(Login model)
+        //{
+        //    if (model == null)
+        //        throw new CustomException() { mensagemErro = "Login nao informado" };
+
+        //    if (string.IsNullOrEmpty(model.Password))
+        //        throw new CustomException() { mensagemErro = "Senha nao informado" };
+
+        //    if (string.IsNullOrEmpty(model.Email))
+        //        throw new CustomException() { mensagemErro = "Email nao informado" };
+
+        //    return _accountService.AuthenticateApi(model);
+
+        //}
+
+        //public RegisterResponse CadastrarApi(Register model)
+        //{
+        //    if (model == null)
+        //        throw new CustomException() { mensagemErro = "Login nao informado" };
+
+        //    if (string.IsNullOrEmpty(model.Password))
+        //        throw new CustomException() { mensagemErro = "Senha nao informado" };
+            
+        //    if (string.IsNullOrEmpty(model.ConfirmPassword))
+        //        throw new CustomException() { mensagemErro = "Senha nao informado" };
+
+        //    if (!string.IsNullOrEmpty(model.Email) && !Util.IsValidEmail(model.Email))
+        //        throw new CustomException() { mensagemErro = "Email nao informado" };
+
+        //    if (model.Password != model.ConfirmPassword)
+        //        throw new CustomException() { mensagemErro = "Senha e confirmação de senha não são iguais" };
+
+        //    if (!string.IsNullOrEmpty(model.Cpf) && !Util.ValidarCPF(model.Cpf))
+        //        throw new CustomException() { mensagemErro = "Para se cadastrar você deve informar um CPF inválido." };
+
+        //    return _accountService.CadastrarApi(model);
+        //}
     }
 }
