@@ -22,7 +22,6 @@ namespace App.Domain.Service
         private readonly ILogger<AccountService> _logger;
         private readonly ITokenService _TokenService;
         private readonly IEmailSistemaService _emailService;
-        private readonly IAccountService _accountService;
         private readonly RoleManager<IdentityRole> _roleManager;
         private readonly SignInManager<Usuario> _signInManager;
         private readonly IHttpContextAccessor _httpContextAccessor;
@@ -36,10 +35,8 @@ namespace App.Domain.Service
             ITokenService ITokenService,
             IEmailSistemaService emailService,
             SignInManager<Usuario> signInManager,
-            IHttpContextAccessor httpContextAccessor,
-            IAccountService accountService)
+            IHttpContextAccessor httpContextAccessor)
         {
-            _accountService = accountService;
             _httpContextAccessor = httpContextAccessor;
             _signInManager = signInManager;
             _roleManager = RoleManager;
@@ -61,12 +58,22 @@ namespace App.Domain.Service
             if (!string.IsNullOrEmpty(model.Email) && !Util.IsValidEmail(model.Email))
                 throw new CustomException() { mensagemErro = "Para se cadastrar você deve informar um email valido!" };
 
-            //if (!string.IsNullOrEmpty(model.Nome))
-            //    throw new CustomException() { mensagemErro = "Para se cadastrar voce deve informar o nome." };
-
             ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
 
             var idUsuario = Guid.NewGuid().ToString();
+            var listaEndereco = new List<Endereco>();
+
+            listaEndereco.Add(new Endereco()
+            {
+                CodigoUsuario = idUsuario,
+                CEP = model.Endereco.CEP,
+                Bairro = model.Endereco.Bairro,
+                Cidade = model.Endereco.Cidade,
+                Estado = model.Endereco.Estado,
+                Numero = model.Endereco.Numero,
+                Rua = model.Endereco.Rua
+            });
+
             var user = new Usuario
             {
                 Id = idUsuario,
@@ -76,16 +83,7 @@ namespace App.Domain.Service
                 Nome = model.Nome,
                 DataNascimento = model.DataNascimento,
                 Sexo = model.Sexo == 1 ? (int)EnumTipo.Sexo.Masculino : model.Sexo == 2 ? (int)EnumTipo.Sexo.Feminino : (int)EnumTipo.Sexo.Outros,
-                Endereco = model.Endereco == null ? null : new Endereco()
-                {
-                    Idusuario = idUsuario,
-                    CEP = model.Endereco.CEP,
-                    Bairro = model.Endereco.Bairro,
-                    Cidade = model.Endereco.Cidade,
-                    Estado = model.Endereco.Estado,
-                    Numero = model.Endereco.Numero,
-                    Rua = model.Endereco.Rua
-                }
+                Enderecos = listaEndereco
             };
 
             var result = await _userManager.CreateAsync(user, model.Password);

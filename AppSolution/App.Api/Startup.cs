@@ -48,15 +48,13 @@ namespace App.Api
             services.AddControllers();
 
 
-
-
             services.AddDbContext<DefaultContext>(options => options.UseSqlServer(Configuration.GetConnectionString("SqlServerConnection")));
             services.AddIdentity<Usuario, IdentityRole>().AddEntityFrameworkStores<DefaultContext>();
 
 
             #region IoC
             //Domain
-            //services.AddTransient<IAccountService, AccountService>();
+            services.AddTransient<IAccountService, AccountService>();
             services.AddTransient<IProdutoService, ProdutoService>();
             services.AddTransient<IDadosCartaoService, DadosCartaoService>();
             services.AddTransient<ITokenService, TokenService>();
@@ -66,11 +64,11 @@ namespace App.Api
             services.AddTransient<IParametrosService, ParametrosService>();
             services.AddTransient<IPedidoService, PedidoService>();
             services.AddTransient<IPagamentoService, PagamentoService>();
-            //services.AddTransient<IProcessTaskService, ProcessTaskService>();
+            
+            services.AddSingleton<IHostedService, SchedulerService>();
 
             services.AddTransient<IMessageQueueService, MessageQueueService>();
-            services.AddTransient<IHostedService, SchedulerService>();
-            
+
 
             //Adapter
             services.AddTransient<IPagamentoAdapter, PagamentoAdapter>();
@@ -84,7 +82,6 @@ namespace App.Api
             services.AddTransient<IPedidoRepository, PedidoRepository>();
             services.AddTransient<IFormasPagamentoRepository, FormasPagamentoRepository>();
 
-            //services.AddTransient<IHttpContextAccessor, HttpContextAccessor>();
             #endregion
 
             services.AddSwaggerGen(c =>
@@ -114,9 +111,6 @@ namespace App.Api
                     IssuerSigningKey = new SymmetricSecurityKey(key),
                     ValidateIssuer = false,
                     ValidateAudience = false,
-                    //ValidIssuer = Configuration["JwtIssuer"],
-                    //ValidAudience = Configuration["JwtIssuer"],
-                    //IssuerSigningKey = new SymmetricSecurityKey(key),
                     ClockSkew = TimeSpan.Zero // remove delay of token when expire
                 };
             });
@@ -192,6 +186,18 @@ namespace App.Api
         {
             if (userManager.FindByNameAsync("Williamf.developer@gmail.com").Result == null)
             {
+                var listaEndereco = new List<Endereco>();
+                listaEndereco.Add( new Endereco()
+                {
+                    CodigoUsuario = "44276c41-f2a1-40f6-a9ce-ec0638046200",
+                    CEP = "13056116",
+                    Rua = "Antonio Rosique Garcia",
+                    Numero = "74",
+                    Bairro = "Jd Aeronave de Viracopos",
+                    Cidade = "Campinas",
+                    Estado = "SP"
+                });
+
                 var user = new Usuario
                 {
                     Id = "44276c41-f2a1-40f6-a9ce-ec0638046200",
@@ -205,16 +211,7 @@ namespace App.Api
                     Nome = "William Fernando da Silva",
                     DataNascimento = Convert.ToDateTime("22/02/1986"),
                     Sexo = (int)EnumTipo.Sexo.Masculino,
-                    Endereco = new Endereco()
-                    {
-                        Idusuario = "44276c41-f2a1-40f6-a9ce-ec0638046200",
-                        CEP = "13056116",
-                        Rua = "Antonio Rosique Garcia",
-                        Numero = "74",
-                        Bairro = "Jd Aeronave de Viracopos",
-                        Cidade = "Campinas",
-                        Estado = "SP"
-                    }
+                    Enderecos = listaEndereco
                 };
 
                 var password = "BR@sil500";
@@ -225,7 +222,6 @@ namespace App.Api
                 {
                     userManager.AddToRoleAsync(user, "Admin").Wait();
                     userManager.AddToRoleAsync(user, "User").Wait();
-                    //userManager.AddToRoleAsync(user, "User_Premium").Wait();
                 }
             }
         }

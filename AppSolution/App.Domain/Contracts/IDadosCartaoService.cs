@@ -9,7 +9,7 @@ namespace App.Domain.Contracts
 {
     public interface IDadosCartaoService
     {
-        Task<bool> AdicionarCartao(CartaoModel cartao, Usuario usuario);
+        bool AdicionarCartao(CartaoModel cartao, Usuario usuario);
         Task<bool> DeletarCartao(string numero);
         Task<DadosCartao>  BuscarCartao(string codigoUsuario, int codigo);
         Task<IList<DadosCartao>> BuscarListaCartoes(string codigoUsuario);

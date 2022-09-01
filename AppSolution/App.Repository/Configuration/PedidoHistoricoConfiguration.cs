@@ -25,9 +25,7 @@ namespace App.Repository.Configuration
             builder.Property(e => e.DataAtualizacaoInicio).HasColumnName("DH_SITUACAO_INICIO").IsRequired();
             builder.Property(e => e.DataAtualizacaoFim).HasColumnName("DH_SITUACAO_FIM").IsRequired();
 
-            // relationsShips
-            //this.HasRequired(m => m.Cidades);
-            //builder.HasOne(x => x.Pedido).WithMany(x => x.PedidoHistorico).HasForeignKey(x => x.CodigoPedido);
+         
         }
     }
 }

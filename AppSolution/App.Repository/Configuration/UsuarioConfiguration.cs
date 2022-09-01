@@ -25,7 +25,10 @@ namespace App.Repository.Configuration
             builder.Property(e => e.Sexo).HasColumnName("ID_SEXO").IsRequired();
 
 
-            
+            // relationsShips
+            builder.HasMany(x => x.Cartoes).WithOne(x => x.Usuario).HasForeignKey(x => x.CodigoUsuario);
+            builder.HasMany(x => x.Enderecos).WithOne(x => x.Usuario).HasForeignKey(x => x.CodigoUsuario);
+
         }
     }
 }

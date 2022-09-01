@@ -5,11 +5,7 @@ namespace App.Domain.Entities
 {
     public class Pedido
     {
-        //public Pedido()
-        //{
-        //    PedidoItem = new HashSet<PedidoItem>();
-        //    PedidoHistorico = new HashSet<PedidoHistorico>();
-        //}
+
         public int CodigoPedido { get; set; }
         public string CodigoUsuario { get; set; }
         public decimal ValorTotal { get; set; }
@@ -21,15 +17,12 @@ namespace App.Domain.Entities
         public DateTime DataAprovacaoPedido { get; set; }
         public int SituacaoPedido { get; set; }
         public string CupomDesconto { get; set; }
-        public int FormaPagamentoid { get; set; }
-
-
-
+        public int CodigoFormaPagamento { get; set; }
 
         //public virtual IdentityUser Usuario { get; set; }
         public virtual ICollection<PedidoItem> PedidoItem { get; set; }
         public virtual ICollection<PedidoHistorico> PedidoHistorico { get; set; }
-        public virtual PedidoPagamento PedidoPagamento { get; set; }
+        public virtual ICollection<PedidoPagamento>  PedidoPagamento { get; set; }
         public virtual FormaPagamento FormaPagamento { get; set; }
 
     }

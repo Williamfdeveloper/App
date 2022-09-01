@@ -24,8 +24,7 @@ namespace App.Repository.Configuration
             builder.Property(e => e.Valor).HasColumnName("MO_VALOR").IsRequired().HasColumnType("decimal(18,2)");
 
             // relationsShips
-            //this.HasRequired(m => m.Cidades);
-            //this.HasMany(x => x.Cidades).WithRequired(x => x.Estado).HasForeignKey(x => x.Estado);
+            builder.HasMany(x => x.ItensPedido).WithOne(x => x.Produto).HasForeignKey(x => x.CodigoProduto);
 
 
 

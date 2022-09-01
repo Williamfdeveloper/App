@@ -29,10 +29,13 @@ namespace App.Repository.Configuration
             builder.Property(e => e.DataAprovacaoPedido).HasColumnName("DH_APROVACAO_PEDIDO").IsRequired();
             builder.Property(e => e.SituacaoPedido).HasColumnName("ID_SITUACAO_PEDIDO").IsRequired();
             builder.Property(e => e.CupomDesconto).HasColumnName("DC_CUPOM").IsRequired();
-            builder.Property(e => e.FormaPagamentoid).HasColumnName("CD_FORMA_PAGAMENTO").IsRequired();
+            builder.Property(e => e.CodigoFormaPagamento).HasColumnName("CD_FORMA_PAGAMENTO").IsRequired();
 
 
             builder.HasMany(x => x.PedidoHistorico).WithOne(x => x.Pedido).HasForeignKey(x => x.CodigoPedido);
+            builder.HasMany(x => x.PedidoItem).WithOne(x => x.Pedido).HasForeignKey(x => x.CodigoPedido);
+            builder.HasMany(x => x.PedidoPagamento).WithOne(x => x.Pedido).HasForeignKey(x => x.CodigoPedido);
+            
         }
     }
 }

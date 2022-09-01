@@ -14,7 +14,8 @@ namespace App.Domain.Entities
         public DateTime DataAprovado { get; set; }
         public DateTime DataAtualizacao { get; set; }
 
-        public virtual IList<PedidoPagamentoHistorico> PedidoPagamentoHistorico { get; set  ;}
+        public virtual ICollection<PedidoPagamentoHistorico> PedidoPagamentoHistorico { get; set  ;}
+        public virtual Pedido Pedido { get; set  ;}
 
     }
 }

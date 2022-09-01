@@ -20,9 +20,6 @@ namespace App.Domain.Service
     {
         private UserManager<Usuario> _userManager;
         private readonly ILogger<PedidoService> _logger;
-        private readonly RoleManager<IdentityRole> _roleManager;
-        private readonly SignInManager<Usuario> _signInManager;
-        private readonly IHttpContextAccessor _httpContextAccessor;
 
         private readonly ILoggerService _loggerService;
         private readonly IProdutoService _produtoService;
@@ -35,9 +32,6 @@ namespace App.Domain.Service
             ILoggerService loggerService,
             UserManager<Usuario> usrMgr,
             ILogger<PedidoService> logger,
-            RoleManager<IdentityRole> RoleManager,
-            SignInManager<Usuario> signInManager,
-            IHttpContextAccessor httpContextAccessor,
             IProdutoService produtoService,
             IFormasPagamentoService formasPagamentoService,
             IPedidoRepository pedidoRepository,
@@ -46,21 +40,12 @@ namespace App.Domain.Service
         {
             _loggerService = loggerService;
             _logger = logger;
-            _httpContextAccessor = httpContextAccessor;
-            _signInManager = signInManager;
-            _roleManager = RoleManager;
             _userManager = usrMgr;
             _produtoService = produtoService;
             _formasPagamentoService = formasPagamentoService;
             _pedidoRepository = pedidoRepository;
             _pagamentoService = pagamentoService;
             _messageQueueService = messageQueueService;
-        }
-
-        public PedidoService(IProdutoService produtoService, IHttpContextAccessor httpContextAccessor)
-        {
-            _httpContextAccessor = httpContextAccessor;
-            _produtoService = produtoService;
         }
 
         public Pedido GerarPedidoInicial(Usuario usuario)
@@ -74,7 +59,7 @@ namespace App.Domain.Service
             pedido.DataAprovacaoPedido = DateTime.MinValue;
             pedido.SituacaoPedido = (int)EnumTipo.SituacaoPedido.EmCaptacao;
             pedido.CupomDesconto = string.Empty;
-            pedido.FormaPagamentoid = (int)EnumTipo.FormaPagamento.Credito;
+            pedido.CodigoFormaPagamento = (int)EnumTipo.FormaPagamento.Credito;
 
             pedido.PedidoHistorico = new List<PedidoHistorico>();
             pedido.PedidoHistorico.Add(new PedidoHistorico()
@@ -148,84 +133,7 @@ namespace App.Domain.Service
 
             return true;
         }
-        public bool FinalizarPedido(Usuario usuario, CartaoModel cartao, Pedido Pedido)
-        {
-            DateTime data = DateTime.Now;
-            if (usuario == null)
-                throw new CustomException() { mensagemErro = "Usuario não informado." };
 
-            if (Pedido == null)
-                throw new CustomException() { mensagemErro = "Objeto pedido não informado." };
-
-            if (Pedido.DataPedido == null)
-                throw new CustomException() { mensagemErro = "Data pedido não informado." };
-
-            if (Pedido.ValorTotal == 0)
-                throw new CustomException() { mensagemErro = "Valor do pedido não informado." };
-
-            if (string.IsNullOrEmpty(Pedido.CodigoUsuario))
-                throw new CustomException() { mensagemErro = "Usuario não informdo no pedido." };
-
-            if (Pedido.FormaPagamento == null)
-                throw new CustomException() { mensagemErro = "Codigo da forma de pagamento do pedido não informado." };
-
-            if (Pedido.SituacaoPedido == 0)
-                throw new CustomException() { mensagemErro = "Status do pedido invalido." };
-
-            if (Pedido.PedidoItem == null || Pedido.PedidoItem.Count() == 0)
-                throw new CustomException() { mensagemErro = "Itens do pedido não informado." };
-
-            if (Pedido.PedidoHistorico == null || Pedido.PedidoHistorico.Count() == 0)
-                throw new CustomException() { mensagemErro = "Historico do pedido não informado." };
-
-            if (Pedido.FormaPagamento.CodigoFormaPagamento != (int)EnumTipo.FormaPagamento.Credito)
-                throw new CustomException() { mensagemErro = "Forma de pagamenmto nao autorizada." };
-
-            Pedido.DataCaptacaoPedido = data;
-            Pedido.CodigoUsuario = usuario.Id;
-
-            Pedido.PedidoHistorico.Add(new PedidoHistorico()
-            {
-                CodigoPedido = Pedido.CodigoPedido,
-                DataSituacao = data,
-                IdSituacaoPedido = (int)EnumTipo.SituacaoPedido.EmCaptacao,
-                DataAtualizacaoInicio = data,
-                DataAtualizacaoFim = data
-            });
-
-            foreach (var item in Pedido.PedidoItem)
-            {
-                item.CodigoPedido = Pedido.CodigoPedido;
-            }
-
-            Pedido.PedidoPagamento.CodigoPedido = Pedido.CodigoPedido;
-            Pedido.PedidoPagamento.PedidoPagamentoHistorico.Add(new PedidoPagamentoHistorico()
-            {
-                CodigoPedidoPagamento = Pedido.PedidoPagamento.CodigoPedidoPagamento,
-                DataAtualizacao = data,
-                IdSituacaoPedidoPagamento = (int)EnumTipo.SituacaoPedidoPagamento.Iniciada
-            });
-
-            var retornoPagamento = _pagamentoService.ProcessarPagamento(cartao, Pedido.ValorTotalComDesconto);
-            switch (retornoPagamento)
-            {
-                case (int)EnumTipo.SituacaoPedidoPagamento.EmAprovacao:
-                    break;
-                case (int)EnumTipo.SituacaoPedidoPagamento.Aprovado:
-                    break;
-                case (int)EnumTipo.SituacaoPedidoPagamento.Cancelado:
-                    break;
-                default:
-                    break;
-            }
-
-            Pedido.FormaPagamento = null;
-
-            if (_pedidoRepository.Salvar(ref Pedido))
-                return _messageQueueService.PostMessageQueue(Pedido, (int)EnumTipo.Queue.Pedido);
-
-            return false;
-        }
         public bool AdicionaPedidoFila(Usuario usuario, FinalizarPedidoModel FinalizarPedidoModel)
         {
             DateTime data = DateTime.Now;
@@ -256,51 +164,41 @@ namespace App.Domain.Service
             if (FinalizarPedidoModel.pedido.PedidoHistorico == null || FinalizarPedidoModel.pedido.PedidoHistorico.Count() == 0)
                 throw new CustomException() { mensagemErro = "Historico do pedido não informado." };
 
-            if (FinalizarPedidoModel.pedido.FormaPagamento.CodigoFormaPagamento != (int)EnumTipo.FormaPagamento.Credito)
+            if (FinalizarPedidoModel.pedido.CodigoFormaPagamento != (int)EnumTipo.FormaPagamento.Credito)
                 throw new CustomException() { mensagemErro = "Forma de pagamenmto nao autorizada." };
 
 
             var pedido = FinalizarPedidoModel.pedido;
-
 
             pedido.DataCaptacaoPedido = data;
             pedido.CodigoUsuario = usuario.Id;
 
             pedido.PedidoHistorico.Add(new PedidoHistorico()
             {
-                //CodigoPedido = FinalizarPedidoModel.pedido.CodigoPedido,
                 DataSituacao = data,
                 IdSituacaoPedido = (int)EnumTipo.SituacaoPedido.EmCaptacao,
                 DataAtualizacaoInicio = data,
                 DataAtualizacaoFim = data
             });
 
-            foreach (var item in pedido.PedidoItem)
-            {
-                item.CodigoPedido = FinalizarPedidoModel.pedido.CodigoPedido;
-            }
 
-            pedido.PedidoPagamento.CodigoPedido = FinalizarPedidoModel.pedido.CodigoPedido;
-            pedido.PedidoPagamento.PedidoPagamentoHistorico.Add(new PedidoPagamentoHistorico()
+            var pedidoPagamento = new PedidoPagamento()
             {
-                CodigoPedidoPagamento = pedido.PedidoPagamento.CodigoPedidoPagamento,
+                DataAprovado = data,
+                DataAtualizacao = data,
+                IdSituacaoPagamento = (int)EnumTipo.SituacaoPedido.EmCaptacao,
+
+            };
+
+            pedidoPagamento.PedidoPagamentoHistorico = new List<PedidoPagamentoHistorico>();
+            pedidoPagamento.PedidoPagamentoHistorico.Add(new PedidoPagamentoHistorico()
+            {
                 DataAtualizacao = data,
                 IdSituacaoPedidoPagamento = (int)EnumTipo.SituacaoPedidoPagamento.Iniciada
             });
 
-            //var retornoPagamento = _pagamentoService.EfetuarPagamento(cartao, Pedido.ValorTotalComDesconto);
-
-            //switch (retornoPagamento)
-            //{
-            //    case (int)EnumTipo.SituacaoPedidoPagamento.EmAprovacao:
-            //        break;
-            //    case (int)EnumTipo.SituacaoPedidoPagamento.Aprovado:
-            //        break;
-            //    case (int)EnumTipo.SituacaoPedidoPagamento.Cancelado:
-            //        break;
-            //    default:
-            //        break;
-            //}
+            pedido.PedidoPagamento = new List<PedidoPagamento>();
+            pedido.PedidoPagamento.Add(pedidoPagamento);
 
             pedido.FormaPagamento = null;
             if (_pedidoRepository.Salvar(ref pedido))
@@ -312,7 +210,7 @@ namespace App.Domain.Service
             return false;
         }
 
-        public bool ProcessarPedidoFila(CartaoModel cartao, ref Pedido pedido)
+        public Task<bool> ProcessarPedidoFila(CartaoModel cartao, ref Pedido pedido)
         {
             if (cartao != null)
                 throw new CustomException() { mensagemErro = "Objeto Pedido não informado." };
@@ -349,7 +247,7 @@ namespace App.Domain.Service
                 throw new CustomException() { mensagemErro = "Usuario não identificado, por gentileza, efetue o Login." };
 
             if (pedido.SituacaoPedido == (int)EnumTipo.SituacaoPedido.EmAprovacao || pedido.SituacaoPedido == (int)EnumTipo.SituacaoPedido.Cancelado)
-                return true;//Retorna true pra remover da fila
+                return Task.FromResult(true);//Retorna true pra remover da fila
 
             var retornopagamento = _pagamentoService.ProcessarPagamento(cartao, pedido.ValorTotalComDesconto);
             var dataAtual = DateTime.Now;
@@ -373,14 +271,24 @@ namespace App.Domain.Service
                         IdSituacaoPedido = (int)EnumTipo.SituacaoPedido.EmAprovacao,
                     });
 
-                    pedido.PedidoPagamento.PedidoPagamentoHistorico.Add(new PedidoPagamentoHistorico()
+                    var pedidoPagamento = new PedidoPagamento()
                     {
-                        CodigoPedidoPagamento = pedido.PedidoPagamento.CodigoPedidoPagamento,
+                        DataAprovado = dataAtual,
+                        DataAtualizacao = dataAtual,
+                        IdSituacaoPagamento = (int)EnumTipo.SituacaoPedido.EmCaptacao,
+
+                    };
+
+                    pedidoPagamento.PedidoPagamentoHistorico.Add(new PedidoPagamentoHistorico()
+                    {
                         DataAtualizacao = dataAtual,
                         IdSituacaoPedidoPagamento = (int)EnumTipo.SituacaoPedidoPagamento.EmAprovacao
                     });
 
-                    return _pedidoRepository.Atualizar(pedido);
+                    pedido.PedidoPagamento.Add(pedidoPagamento);
+
+
+                    return Task.FromResult(_pedidoRepository.Atualizar(pedido));
                 case (int)EnumTipo.SituacaoPedidoPagamento.Aprovado:
                     pedido.SituacaoPedido = (int)EnumTipo.SituacaoPedido.Finalizado;
                     pedido.DataAtualizacaoPedido = dataAtual;
@@ -399,15 +307,23 @@ namespace App.Domain.Service
                         IdSituacaoPedido = (int)EnumTipo.SituacaoPedido.Finalizado,
                     });
 
-                    pedido.PedidoPagamento.PedidoPagamentoHistorico.Add(new PedidoPagamentoHistorico()
+                    var pedidoPagamento1 = new PedidoPagamento()
                     {
-                        CodigoPedidoPagamento = pedido.PedidoPagamento.CodigoPedidoPagamento,
+                        DataAprovado = dataAtual,
+                        DataAtualizacao = dataAtual,
+                        IdSituacaoPagamento = (int)EnumTipo.SituacaoPedido.EmCaptacao,
+
+                    };
+
+                    pedidoPagamento1.PedidoPagamentoHistorico.Add(new PedidoPagamentoHistorico()
+                    {
                         DataAtualizacao = dataAtual,
                         IdSituacaoPedidoPagamento = (int)EnumTipo.SituacaoPedidoPagamento.Aprovado
-
                     });
 
-                    return _pedidoRepository.Atualizar(pedido);
+                    pedido.PedidoPagamento.Add(pedidoPagamento1);
+
+                    return Task.FromResult(_pedidoRepository.Atualizar(pedido));
                 case (int)EnumTipo.SituacaoPedidoPagamento.Cancelado:
                     pedido.SituacaoPedido = (int)EnumTipo.SituacaoPedido.Cancelado;
                     pedido.DataAtualizacaoPedido = dataAtual;
@@ -426,15 +342,24 @@ namespace App.Domain.Service
                         IdSituacaoPedido = (int)EnumTipo.SituacaoPedido.Cancelado,
                     });
 
-                    pedido.PedidoPagamento.PedidoPagamentoHistorico.Add(new PedidoPagamentoHistorico()
+
+                    var pedidoPagamento2 = new PedidoPagamento()
                     {
-                        CodigoPedidoPagamento = pedido.PedidoPagamento.CodigoPedidoPagamento,
+                        DataAprovado = dataAtual,
+                        DataAtualizacao = dataAtual,
+                        IdSituacaoPagamento = (int)EnumTipo.SituacaoPedido.EmCaptacao,
+
+                    };
+
+                    pedidoPagamento2.PedidoPagamentoHistorico.Add(new PedidoPagamentoHistorico()
+                    {
                         DataAtualizacao = dataAtual,
                         IdSituacaoPedidoPagamento = (int)EnumTipo.SituacaoPedidoPagamento.Cancelado
-
                     });
 
-                    return _pedidoRepository.Atualizar(pedido);
+                    pedido.PedidoPagamento.Add(pedidoPagamento2);
+                    
+                    return Task.FromResult(_pedidoRepository.Atualizar(pedido));
                 default:
                     break;
             }
@@ -442,6 +367,11 @@ namespace App.Domain.Service
 
 
 
+            throw new NotImplementedException();
+        }
+
+        public bool FinalizarPedido(Usuario usuario, CartaoModel cartao, Pedido Pedido)
+        {
             throw new NotImplementedException();
         }
     }

@@ -52,8 +52,6 @@ namespace App.Domain.Service
             if (Forma.QuantidadeParcelas == 0)
                 Forma.QuantidadeParcelas = 1;
 
-            //if (Forma.codigointegracaopagamento == 0)
-            //    Forma.codigointegracaopagamento = 0;
 
             return _IFormasPagamentoRepository.Atualizar(Forma);
         }

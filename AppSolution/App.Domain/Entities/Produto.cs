@@ -12,5 +12,7 @@ namespace App.Domain.Entities
         public decimal Valor { get; set; }
         public string LinkDownload { get; set; }
 
+        public virtual ICollection<PedidoItem> ItensPedido { get; set; }
+
     }
 }

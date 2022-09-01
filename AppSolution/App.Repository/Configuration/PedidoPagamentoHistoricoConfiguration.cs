@@ -24,9 +24,6 @@ namespace App.Repository.Configuration
             builder.Property(e => e.DataAtualizacao).HasColumnName("DH_ATUALIZACAO").IsRequired();
 
 
-            // relationsShips
-            //this.HasRequired(m => m.Cidades);
-            //this.HasMany(x => x.Cidades).WithRequired(x => x.Estado).HasForeignKey(x => x.Estado);
         }
     }
 }

@@ -1,6 +1,7 @@
 ﻿using App.Domain.Entities;
 using App.Domain.Entities.Cartao;
 using App.Domain.Entities.TransacaoPedido;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace App.Domain.Contracts
@@ -13,6 +14,6 @@ namespace App.Domain.Contracts
         bool FinalizarPedido(Usuario usuario, CartaoModel cartao, Pedido Pedido);
         bool AdicionaPedidoFila(Usuario usuario, FinalizarPedidoModel FinalizarPedidoModel);
         Pedido ConsultarPedido(int CodigoPedido);
-        bool ProcessarPedidoFila(CartaoModel cartao, ref Pedido pedido);
+        Task<bool> ProcessarPedidoFila(CartaoModel cartao, ref Pedido pedido);
     }
 }

@@ -1,5 +1,7 @@
 ﻿using App.Domain.Contracts;
+using App.Domain.Contracts.Repository;
 using App.Domain.Entities;
+using App.Domain.Entities.Cartao;
 using App.Domain.Entities.TransacaoPedido;
 using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
@@ -7,108 +9,180 @@ using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace App.Domain.Service
 {
-    public class SchedulerService : BackgroundService
+    public class SchedulerService : ISchedulerService
     {
-        //private readonly MessageQueueService _messageQueueService;
-        public IServiceScopeFactory _serviceScopeFactory;
-        //private readonly ILoggerService _loggerService;
+        private readonly IPagamentoService _pagamentoService;
+        private readonly IPedidoRepository _pedidoRepository;
+        private readonly ILoggerService _loggerService;
 
-        public SchedulerService(/*MessageQueueService messageQueueService,*/ IServiceScopeFactory serviceScopeFactory) //, ILoggerService loggerService)
+        public SchedulerService(IPagamentoService pagamentoService, IPedidoRepository pedidoRepository, ILoggerService loggerService)
         {
-            //_loggerService = loggerService;
-            //_messageQueueService = messageQueueService;
-            _serviceScopeFactory = serviceScopeFactory;
+            _loggerService = loggerService;
+            _pagamentoService = pagamentoService;
+            _pedidoRepository = pedidoRepository;
         }
 
-        protected override async Task ExecuteAsync(CancellationToken cancellationToken)
+        public Task<bool> ProcessarPedidoFila(CartaoModel cartao, ref Pedido pedido)
         {
+            if (cartao == null)
+                throw new CustomException() { mensagemErro = "Objeto Pedido não informado." };
 
-            //ImplementarRepositoryBase passando o dbcontext 
-            using (var scope = _serviceScopeFactory.CreateScope())
+            if (pedido == null)
+                throw new CustomException() { mensagemErro = "Objeto pedido não informado." };
+
+            if (pedido.DataPedido == null)
+                throw new CustomException() { mensagemErro = "Data pedido não informado." };
+
+            if (pedido.ValorTotal == 0)
+                throw new CustomException() { mensagemErro = "Valor do pedido não informado." };
+
+            if (string.IsNullOrEmpty(pedido.CodigoUsuario))
+                throw new CustomException() { mensagemErro = "Usuario não informdo no pedido." };
+
+            if (pedido.FormaPagamento == null)
+                throw new CustomException() { mensagemErro = "Codigo da forma de pagamento do pedido não informado." };
+
+            if (pedido.SituacaoPedido == 0)
+                throw new CustomException() { mensagemErro = "Status do pedido invalido." };
+
+            if (pedido.PedidoItem == null || pedido.PedidoItem.Count() == 0)
+                throw new CustomException() { mensagemErro = "Itens do pedido não informado." };
+
+            if (pedido.PedidoHistorico == null || pedido.PedidoHistorico.Count() == 0)
+                throw new CustomException() { mensagemErro = "Historico do pedido não informado." };
+
+            if (pedido.FormaPagamento.CodigoFormaPagamento != (int)EnumTipo.FormaPagamento.Credito)
+                throw new CustomException() { mensagemErro = "Forma de pagamenmto nao autorizada." };
+
+            if (pedido.SituacaoPedido == (int)EnumTipo.SituacaoPedido.EmAprovacao || pedido.SituacaoPedido == (int)EnumTipo.SituacaoPedido.Cancelado)
+                return Task.FromResult(true);//Retorna true pra remover da fila
+
+            var retornopagamento = _pagamentoService.ProcessarPagamento(cartao, pedido.ValorTotalComDesconto);
+            var dataAtual = DateTime.Now;
+
+            switch (retornopagamento)
             {
-                //IScoped scoped = scope.ServiceProvider.GetRequiredService();
+                case (int)EnumTipo.SituacaoPedidoPagamento.EmAprovacao:
+                    pedido.SituacaoPedido = (int)EnumTipo.SituacaoPedido.EmAprovacao;
+                    pedido.DataAtualizacaoPedido = dataAtual;
 
-                while (!cancellationToken.IsCancellationRequested)
-                {
-                    //var factory = new ConnectionFactory() { HostName = "localhost" };
-                    //using (var connection = factory.CreateConnection())
-                    //using (var channel = connection.CreateModel())
-                    //{
-                    //    QueueDeclare(channel, EnumTipo.Queue.Pedido.ToString()); //((EnumTipo.Queue)fila).ToString());
+                    pedido.PedidoHistorico.Where(c => c.CodigoPedido.Equals(c.CodigoPedido) && c.DataAtualizacaoFim.Equals(null)).Select(c =>
+                    {
+                        c.DataAtualizacaoFim = dataAtual;
+                        return c;
+                    }).OrderByDescending(c => c.DataSituacao).ToList();
 
-                    //    var consumer = new EventingBasicConsumer(channel);
+                    pedido.PedidoHistorico.Add(new PedidoHistorico()
+                    {
+                        CodigoPedido = pedido.CodigoPedido,
+                        DataAtualizacaoInicio = dataAtual,
+                        DataSituacao = dataAtual,
+                        IdSituacaoPedido = (int)EnumTipo.SituacaoPedido.EmAprovacao,
+                    });
 
-                    //    consumer.Received += (model, ea) =>
-                    //    {
-                    //        try
-                    //        {
-                    //            var body = ea.Body.ToArray();
-                    //            var message = Encoding.UTF8.GetString(body);
+                    var pedidoPagamento = new PedidoPagamento()
+                    {
+                        DataAprovado = dataAtual,
+                        DataAtualizacao = dataAtual,
+                        IdSituacaoPagamento = (int)EnumTipo.SituacaoPedido.EmCaptacao,
 
-                    //            switch ((int)EnumTipo.Queue.Pedido)
-                    //            {
-                    //                case (int)EnumTipo.Queue.Pedido:
-                    //                    var FinalizarPedido = JsonConvert.DeserializeObject<FinalizarPedidoModel>(message);
-                    //                    if (FinalizarPedido == null)
-                    //                        throw new CustomException() { mensagemErro = "Erro ao coletar pedido na fila" };
+                    };
 
-                    //                    var pedido = FinalizarPedido.pedido;
+                    pedidoPagamento.PedidoPagamentoHistorico.Add(new PedidoPagamentoHistorico()
+                    {
+                        DataAtualizacao = dataAtual,
+                        IdSituacaoPedidoPagamento = (int)EnumTipo.SituacaoPedidoPagamento.EmAprovacao
+                    });
 
-                    //                        //if (_pedidoService.ProcessarPedidoFila(FinalizarPedidoModel.Cartao, ref pedido))
-                    //                        //    channel.BasicAck(ea.DeliveryTag, false);
+                    pedido.PedidoPagamento.Add(pedidoPagamento);
 
-                    //                    throw new CustomException() { mensagemErro = $"Ocorreu um erro ao processar pedido: {pedido.CodigoPedido}" };
-                    //                default:
-                    //                    break;
-                    //            }
 
-                    //        }
-                    //        catch (AggregateException cex) when (cex.InnerException is CustomException)
-                    //        {
-                    //            //_loggerService.InsertLog(cex);
+                    return Task.FromResult(_pedidoRepository.Atualizar(pedido));
+                case (int)EnumTipo.SituacaoPedidoPagamento.Aprovado:
+                    pedido.SituacaoPedido = (int)EnumTipo.SituacaoPedido.Finalizado;
+                    pedido.DataAtualizacaoPedido = dataAtual;
 
-                    //                //return BadRequest(_loggerService.InsertLog(cex).mensagemErro);
-                    //            channel.BasicNack(ea.DeliveryTag, false, false);
-                    //        }
-                    //        catch (Exception ex)
-                    //        {
-                    //            string erro = $"Message:{ex.Message} - StackTrace: {ex.StackTrace}";
-                    //            //_loggerService.InsertLog(ex);
+                    pedido.PedidoHistorico.Where(c => c.CodigoPedido.Equals(c.CodigoPedido) && c.DataAtualizacaoFim.Equals(null)).Select(c =>
+                    {
+                        c.DataAtualizacaoFim = dataAtual;
+                        return c;
+                    }).OrderByDescending(c => c.DataSituacao).ToList();
 
-                    //            channel.BasicNack(ea.DeliveryTag, false, false);
-                    //        }
+                    pedido.PedidoHistorico.Add(new PedidoHistorico()
+                    {
+                        CodigoPedido = pedido.CodigoPedido,
+                        DataAtualizacaoInicio = dataAtual,
+                        DataSituacao = dataAtual,
+                        IdSituacaoPedido = (int)EnumTipo.SituacaoPedido.Finalizado,
+                    });
 
-                    //    };
-                    //    channel.BasicConsume(queue: EnumTipo.Queue.Pedido.ToString(),
-                    //                         autoAck: true,
-                    //                         consumer: consumer);
+                    var pedidoPagamento1 = new PedidoPagamento()
+                    {
+                        DataAprovado = dataAtual,
+                        DataAtualizacao = dataAtual,
+                        IdSituacaoPagamento = (int)EnumTipo.SituacaoPedido.EmCaptacao,
 
-                    //}
+                    };
 
-                    await Task.Delay(TimeSpan.FromSeconds(5), cancellationToken);
-                }
+                    pedidoPagamento1.PedidoPagamentoHistorico.Add(new PedidoPagamentoHistorico()
+                    {
+                        DataAtualizacao = dataAtual,
+                        IdSituacaoPedidoPagamento = (int)EnumTipo.SituacaoPedidoPagamento.Aprovado
+                    });
+
+                    pedido.PedidoPagamento.Add(pedidoPagamento1);
+
+                    return Task.FromResult(_pedidoRepository.Atualizar(pedido));
+                case (int)EnumTipo.SituacaoPedidoPagamento.Cancelado:
+                    pedido.SituacaoPedido = (int)EnumTipo.SituacaoPedido.Cancelado;
+                    pedido.DataAtualizacaoPedido = dataAtual;
+
+                    pedido.PedidoHistorico.Where(c => c.CodigoPedido.Equals(c.CodigoPedido) && c.DataAtualizacaoFim.Equals(null)).Select(c =>
+                    {
+                        c.DataAtualizacaoFim = dataAtual;
+                        return c;
+                    }).OrderByDescending(c => c.DataSituacao).ToList();
+
+                    pedido.PedidoHistorico.Add(new PedidoHistorico()
+                    {
+                        CodigoPedido = pedido.CodigoPedido,
+                        DataAtualizacaoInicio = dataAtual,
+                        DataSituacao = dataAtual,
+                        IdSituacaoPedido = (int)EnumTipo.SituacaoPedido.Cancelado,
+                    });
+
+
+                    var pedidoPagamento2 = new PedidoPagamento()
+                    {
+                        DataAprovado = dataAtual,
+                        DataAtualizacao = dataAtual,
+                        IdSituacaoPagamento = (int)EnumTipo.SituacaoPedido.EmCaptacao,
+
+                    };
+
+                    pedidoPagamento2.PedidoPagamentoHistorico.Add(new PedidoPagamentoHistorico()
+                    {
+                        DataAtualizacao = dataAtual,
+                        IdSituacaoPedidoPagamento = (int)EnumTipo.SituacaoPedidoPagamento.Cancelado
+                    });
+
+                    pedido.PedidoPagamento.Add(pedidoPagamento2);
+
+                    return Task.FromResult(_pedidoRepository.Atualizar(pedido));
+                default:
+                    break;
             }
+
+            throw new NotImplementedException();
         }
-
-        private void QueueDeclare(IModel channel, string fila)
-        {
-            try
-            {
-                channel.QueueDeclare(queue: fila,
-                                     durable: false,
-                                     exclusive: false,
-                                     autoDelete: false,
-                                     arguments: null);
-
-            }
-            catch { }
-        }
-
     }
+
 }
+

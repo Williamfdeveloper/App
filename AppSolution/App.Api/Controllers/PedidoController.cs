@@ -48,10 +48,10 @@ namespace App.Api.Controllers
 
                 var pedido = _pedidoService.GerarPedidoInicial(usuario);
 
-                if (pedido != null && pedido.CodigoPedido > 0)
+                if (pedido != null)
                     return Ok(pedido);
                 else
-                    return BadRequest("Erro ao finalizar pedido!");
+                    return BadRequest("Erro ao gerar pedido inicial!");
 
             }
             catch (AggregateException cex) when (cex.InnerException is CustomException)
@@ -124,42 +124,6 @@ namespace App.Api.Controllers
                     return Ok(FomaPagamentoModel.pedido);
                 else
                     return BadRequest("Erro ao adicionar forma de pagamento ao pedido!");
-
-            }
-            catch (AggregateException cex) when (cex.InnerException is CustomException)
-            {
-                _logger.LogError(cex.ToString());
-
-                return BadRequest(_loggerService.InsertLog(cex).mensagemErro);
-            }
-            catch (Exception ex)
-            {
-                string erro = $"Message:{ex.Message} - StackTrace: {ex.StackTrace}";
-                _logger.LogError(erro);
-                _loggerService.InsertLog(ex);
-
-                var retorno = Content(erro);
-                retorno.StatusCode = (int)HttpStatusCode.InternalServerError;
-
-                return retorno;
-            }
-        }
-
-        [HttpPost]
-        [Route("FinalizarPedido")]
-        [Authorize(Roles = "User")]
-        public async Task<ActionResult> FinalizarPedidoarPedidoAsync([FromBody] FinalizarPedidoModel FinalizarPedidoModel)
-        {
-            try
-            {
-                var usuario = _userManager.FindByNameAsync(User.Identity.Name).Result;
-                if (usuario == null)
-                    throw new CustomException() { mensagemErro = "Usuario não identificado, por gentileza, efetue o Login." };
-
-                if (_pedidoService.FinalizarPedido(usuario, FinalizarPedidoModel.Cartao, FinalizarPedidoModel.pedido))
-                    return Ok("Pedido Finalizado com sucesso");
-                else
-                    return BadRequest("Erro ao finalizar pedido!");
 
             }
             catch (AggregateException cex) when (cex.InnerException is CustomException)

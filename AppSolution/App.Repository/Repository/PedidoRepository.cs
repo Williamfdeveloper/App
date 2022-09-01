@@ -15,59 +15,49 @@ namespace App.Repository.Repository
         DefaultContext _context;
         public PedidoRepository(DefaultContext context, IServiceScopeFactory serviceScopeFactory)
         {
-            _context = context;
+            //_context = context;
             _serviceScopeFactory = serviceScopeFactory;
+            _context = _serviceScopeFactory.CreateScope().ServiceProvider.GetRequiredService<DefaultContext>();
         }
 
         public bool Atualizar(Pedido Pedido)
         {
+            //_context = _serviceScopeFactory.CreateScope().ServiceProvider.GetRequiredService<DefaultContext>();
 
-
-            using (var scope = _serviceScopeFactory.CreateScope())
+            using (var transaction = _context.Database.BeginTransaction())
             {
-                //IScoped scoped = scope.ServiceProvider.GetRequiredService();
-                using (var transaction = _context.Database.BeginTransaction())
+                try
                 {
-                    try
-                    {
-                        _context.Entry(Pedido).State = EntityState.Modified;
-                        _context.Entry(Pedido).Reference(x => x.FormaPagamento).IsModified = false;
+                    _context.Entry(Pedido).State = EntityState.Modified;
+                    _context.Entry(Pedido).Reference(x => x.FormaPagamento).IsModified = false;
 
-                        if (_context.SaveChanges() > 0)
-                        {
-                            // Commit transaction if all commands succeed, transaction will auto-rollback
-                            // when disposed if either commands fails
-                            transaction.Commit();
-                            return true;
-                        }
-                        else
-                        {
-                            transaction.Rollback();
-                            return false;
-                        }
+                    if (_context.SaveChanges() > 0)
+                    {
+                        transaction.Commit();
+                        return true;
                     }
-                    catch (Exception ex)
+                    else
                     {
                         transaction.Rollback();
-                        throw ex;
-                        // TODO: Handle failure
+                        return false;
                     }
                 }
-
-                //Do your stuff
+                catch (Exception ex)
+                {
+                    transaction.Rollback();
+                    throw ex;
+                }
             }
-            //return Task.CompletedTask;
-
-
-
-
         }
 
         public Pedido Buscar(int PedidoID)
         {
+
             return _context.Pedido.Where(c => c.CodigoPedido.Equals(PedidoID))
-                .Include(c => c.FormaPagamento)
-                .Include(c => c.PedidoItem).FirstOrDefault();
+                .Include(c => c.PedidoItem)
+                .Include(c => c.PedidoHistorico)
+                .Include(c => c.PedidoPagamento)
+                .Include(c => c.FormaPagamento).FirstOrDefault();
         }
 
         public IList<Pedido> BuscarLista()

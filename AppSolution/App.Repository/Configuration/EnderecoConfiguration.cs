@@ -19,7 +19,7 @@ namespace App.Repository.Configuration
 
             // Properties / Column Mapping
             builder.Property(e => e.CodigoEndereco).HasColumnName("ID_ENDERECO").IsRequired().ValueGeneratedOnAdd();
-            builder.Property(e => e.Idusuario).HasColumnName("CD_USUARIO").IsRequired();
+            builder.Property(e => e.CodigoUsuario).HasColumnName("CD_USUARIO").IsRequired();
             builder.Property(e => e.Rua).HasColumnName("DC_RUA").IsRequired();
             builder.Property(e => e.Numero).HasColumnName("DC_NUMERO").IsRequired();
             builder.Property(e => e.Bairro).HasColumnName("DC_BAIRRO").IsRequired();
@@ -28,9 +28,6 @@ namespace App.Repository.Configuration
             builder.Property(e => e.CEP).HasColumnName("DC_CEP").IsRequired();
 
 
-            // relationsShips
-            //this.HasRequired(m => m.Cidades);
-            //this.HasMany(x => x.Cidades).WithRequired(x => x.Estado).HasForeignKey(x => x.Estado);
         }
     }
 }

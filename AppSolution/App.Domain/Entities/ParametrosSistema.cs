@@ -10,7 +10,6 @@ namespace App.Domain.Entities
         [Key]
         public Guid parametrosid { get; set; }
         public string nome { get; set; }
-        //[AllowHtml]
         public string valor { get; set; }
         public string descricao { get; set; }
         public int tipocampo { get; set; }

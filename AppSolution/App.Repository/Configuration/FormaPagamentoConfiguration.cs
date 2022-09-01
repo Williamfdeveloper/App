@@ -21,9 +21,7 @@ namespace App.Repository.Configuration
             builder.Property(e => e.IdTipoFormaPagamento).HasColumnName("ID_TIPO_FORMA_PAGAMENTO").IsRequired();
 
             // relationsShips
-            //this.HasRequired(m => m.Cidades);
-            //this.HasMany(x => x.Cidades).WithRequired(x => x.Estado).HasForeignKey(x => x.Estado);
-
+            builder.HasMany(x => x.Pedidos).WithOne(x => x.FormaPagamento).HasForeignKey(x => x.CodigoFormaPagamento);
 
 
             builder.HasData(

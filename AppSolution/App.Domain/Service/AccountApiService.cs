@@ -13,24 +13,13 @@ namespace App.Domain.Service
 {
     public class AccountApiService : IAccountApiService
     {
-        //private readonly ILogger<AccountService> _logger;
-        //private readonly ITokenService _TokenService;
-        //private readonly IEmailSistemaService _emailService;
+        
         private readonly IAccountAdapter _accountAdapter;
-        //private readonly IHttpContextAccessor _httpContextAccessor;
 
         public AccountApiService(
-            //ILogger<AccountService> logger,
-            //ITokenService ITokenService,
-            //IEmailSistemaService emailService,
-            //IHttpContextAccessor httpContextAccessor,
             IAccountAdapter accountAdapter)
         {
             _accountAdapter = accountAdapter;
-            //_httpContextAccessor = httpContextAccessor;
-            //_emailService = emailService;
-            //_TokenService = ITokenService;
-            //_logger = logger;
         }
 
         public LoginResponse AuthenticateApi(Login model)

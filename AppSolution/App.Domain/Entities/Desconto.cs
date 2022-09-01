@@ -15,6 +15,5 @@ namespace App.Domain.Entities
         public DateTime validade { get; set; }
         public string regra { get; set; }
         public bool ativo { get; set; }
-        //public bool cupomunitrario { get; set; }
     }
 }

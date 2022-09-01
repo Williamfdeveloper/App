@@ -3,12 +3,16 @@ using App.Domain;
 using App.Domain.Contracts;
 using App.Domain.Contracts.Adapter;
 using App.Domain.Contracts.Repository;
+using App.Domain.Entities;
 using App.Domain.Service;
+using App.Repository.Context;
 using App.Repository.Repository;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.HttpsPolicy;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -36,6 +40,9 @@ namespace App.UI
         {
             services.AddRazorPages();
 
+            services.AddDbContext<DefaultContext>(options => options.UseSqlServer(Configuration.GetConnectionString("SqlServerConnection")));
+            services.AddIdentity<Usuario, IdentityRole>().AddEntityFrameworkStores<DefaultContext>();
+
             #region IoC
             //Domain
             //services.AddTransient<IAccountService, AccountService>();
@@ -48,7 +55,6 @@ namespace App.UI
             //services.AddTransient<IParametrosService, ParametrosService>();
             //services.AddTransient<IPedidoService, PedidoService>();
             //services.AddTransient<IPagamentoService, PagamentoService>();
-            //services.AddTransient<IProcessTaskService, ProcessTaskService>();
 
             //services.AddTransient<IMessageQueueService, MessageQueueService>();
             //services.AddTransient<IHostedService, SchedulerService>();
@@ -59,6 +65,7 @@ namespace App.UI
             //Adapter
             services.AddTransient<IAccountAdapter, AccountAdapter>();
             services.AddTransient<IProdutoAdapter, ProdutoAdapter>();
+            services.AddTransient<IPedidoAdapter, PedidoAdapter>();
             //services.AddTransient<IPagamentoAdapter, PagamentoAdapter>();
 
             //Repository
@@ -70,7 +77,7 @@ namespace App.UI
             //services.AddTransient<IPedidoRepository, PedidoRepository>();
             //services.AddTransient<IFormasPagamentoRepository, FormasPagamentoRepository>();
 
-            //services.AddTransient<IHttpContextAccessor, HttpContextAccessor>();
+            services.AddTransient<IHttpContextAccessor, HttpContextAccessor>();
             #endregion
 
 

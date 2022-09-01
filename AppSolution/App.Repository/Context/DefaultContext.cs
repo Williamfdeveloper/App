@@ -33,7 +33,7 @@ namespace App.Repository.Context
         public virtual DbSet<Usuario> Usuario { get; set; }
 
 
-        //protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder) => optionsBuilder.UseSqlServer("DataSource=app.db");
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder) => optionsBuilder.UseSqlServer("Data Source=.\\;initial catalog=App;Trusted_Connection=True;MultipleActiveResultSets=true");
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

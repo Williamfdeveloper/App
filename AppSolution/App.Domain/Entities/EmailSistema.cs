@@ -13,9 +13,5 @@ namespace App.Domain.Entities
         public string UsernamePassword { get; set; }
         public string ServerNameDisplay { get; set; }
         public int TipodEmail { get; set; }
-        //public string FromEmail { get; set; }
-        //public string ToEmail { get; set; }
-        //public string CcEmail { get; set; }
-        //public string EmailCopiaOculta { get; set; }
     }
 }

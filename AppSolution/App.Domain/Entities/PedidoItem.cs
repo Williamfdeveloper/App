@@ -7,10 +7,7 @@ namespace App.Domain.Entities
 {
     public class PedidoItem
     {
-        //public PedidoItem()
-        //{
-        //    Produtos = new HashSet<Produto>();
-        //}
+        
         public int CodigoPedido { get; set; }
         public int CodigoPedidoItem { get; set; }
         public int CodigoProduto { get; set; }
@@ -19,7 +16,8 @@ namespace App.Domain.Entities
         public decimal ValorUnitario { get; set; }
         public decimal ValorTotal { get; set; }
 
-        //public virtual IList<Produto> Produtos { get; set; }
+        public virtual Pedido Pedido { get; set; }
+        public virtual Produto Produto { get; set; }
 
     }
 }

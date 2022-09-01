@@ -22,10 +22,6 @@ namespace App.Repository.Configuration
             builder.Property(e => e.HashCartao).HasColumnName("DC_HASH_CARTAO").IsRequired();
             builder.Property(e => e.DataVencimentoCartao).HasColumnName("DT_VENCIMENTO").IsRequired();
 
-
-            // relationsShips
-            //this.HasRequired(m => m.Cidades);
-            //this.HasMany(x => x.Cidades).WithRequired(x => x.Estado).HasForeignKey(x => x.Estado);
         }
     }
 }

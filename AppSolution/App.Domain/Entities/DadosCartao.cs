@@ -14,5 +14,7 @@ namespace App.Domain.Entities
         public string HashCartao { get; set; }
         public string DataVencimentoCartao { get; set; }
 
+        public virtual Usuario Usuario { get; set; }
+
     }
 }

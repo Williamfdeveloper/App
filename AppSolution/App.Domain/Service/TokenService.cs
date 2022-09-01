@@ -18,12 +18,6 @@ namespace App.Domain.Service
             var tokenDescriptor = new SecurityTokenDescriptor
             {
                 Subject = new ClaimsIdentity(claims),
-
-                //Subject = new ClaimsIdentity(new Claim[]
-                //{
-                //    new Claim(ClaimTypes.Name, user.UserName.ToString()),
-                //    new Claim(ClaimTypes.Role, "employee")
-                //}),
                 Expires = DateTime.UtcNow.AddHours(2),
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
             };

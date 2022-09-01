@@ -20,7 +20,7 @@ namespace App.Domain.Service
 
         }
 
-        public async Task<bool> AdicionarCartao(CartaoModel cartao, Usuario usuario)
+        public bool AdicionarCartao(CartaoModel cartao, Usuario usuario)
         {
             if (cartao == null)
                 throw new CustomException() { mensagemErro = "Cartão não informado" };

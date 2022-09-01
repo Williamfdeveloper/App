@@ -25,9 +25,6 @@ namespace App.Repository.Configuration
             builder.Property(e => e.createdtime).HasColumnName("DH_LOG_ERRO").IsRequired();
 
 
-            // relationsShips
-            //this.HasRequired(m => m.Cidades);
-            //this.HasMany(x => x.Cidades).WithRequired(x => x.Estado).HasForeignKey(x => x.Estado);
         }
     }
 }

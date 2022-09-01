@@ -15,5 +15,7 @@ namespace App.Domain.Entities
         public int IdTipoFormaPagamento{ get; set; }
         public bool Ativa { get; set; }
 
+
+        public virtual IList<Pedido> Pedidos { get; set; }
     }
 }
