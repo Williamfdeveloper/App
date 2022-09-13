@@ -65,7 +65,6 @@ namespace App.Api
             services.AddTransient<IPedidoService, PedidoService>();
             services.AddTransient<IPagamentoService, PagamentoService>();
             
-            services.AddSingleton<IHostedService, SchedulerService>();
 
             services.AddTransient<IMessageQueueService, MessageQueueService>();
 
